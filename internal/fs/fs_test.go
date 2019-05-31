@@ -1,12 +1,12 @@
 package fs_test
 
 import (
+	"errors"
 	"github.com/thazelart/terraform-validator/internal/fs"
 	"os"
 	"path"
 	"reflect"
 	"testing"
-	"errors"
 )
 
 func TestEnsureOrFatal(t *testing.T) {
@@ -37,15 +37,15 @@ func TestListTerraformFiles(t *testing.T) {
 	defer os.Remove(testFilePath)
 
 	expectedFileFlist := []string{testFilePath}
-	resultFileList := fs.File{testPath}.ListTerraformFiles()
+	resultFileList := fs.File{Path: testPath}.ListTerraformFiles()
 	if !reflect.DeepEqual(expectedFileFlist, resultFileList) {
 		t.Errorf("Got: %v, wanted: %v", expectedFileFlist, resultFileList)
 	}
 }
 
 func TestFileEqual(t *testing.T) {
-	file1 := fs.File{"fs_test.go"}
-	file2 := fs.File{"fs_example_test.go"}
+	file1 := fs.File{Path: "fs_test.go"}
+	file2 := fs.File{Path: "fs_example_test.go"}
 
 	result1 := file1.FileEqual(file1)
 	result2 := file1.FileEqual(file2)
