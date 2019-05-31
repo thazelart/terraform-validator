@@ -3,19 +3,18 @@ package fs_test
 import (
 	"fmt"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"testing"
 )
 
 func ExampleListTerraformFiles() {
 	path := "/tmp"
 	var fileList []string
-	fileList = fs.File{path}.ListTerraformFiles()
+	fileList = fs.File{Path: path}.ListTerraformFiles()
 	fmt.Printf("%v", fileList)
 }
 
-func ExampleFileEqual(t *testing.T) {
-	file1 := fs.File{"my_file.txt"}
-	file2 := fs.File{"another_one.txt"}
+func ExampleFileEqual() {
+	file1 := fs.File{Path: "my_file.txt"}
+	file2 := fs.File{Path: "another_one.txt"}
 
 	result := file1.FileEqual(file2)
 
