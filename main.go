@@ -6,9 +6,8 @@ import (
 )
 
 func main() {
-	workDir := fs.File{Path: "/tmp"}
+	workDir := fs.NewTerraformFolder("examples/default_config")
 	fmt.Println("Work in progress")
 
-	fileList := workDir.ListTerraformFiles()
-	fmt.Printf("We will work on that list of files: %v\n", fileList)
+	fmt.Printf("We will work on that folder: %s\n", workDir.Path)
 }
