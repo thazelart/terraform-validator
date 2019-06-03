@@ -1,8 +1,8 @@
 package fs_test
 
 import (
+	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"reflect"
 	"testing"
 )
 
@@ -13,8 +13,8 @@ func TestNewFile(t *testing.T) {
 	expectedResult := fs.File{Path: filePath, Content: fileContent}
 	testResult := fs.NewFile(filePath)
 
-	if !reflect.DeepEqual(testResult, expectedResult) {
-		t.Errorf("Got: %v, wanted: %v", testResult, expectedResult)
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("NewFile() mismatch (-want +got):\n%s", diff)
 	}
 }
 

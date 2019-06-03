@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/thazelart/terraform-validator/internal/fs"
+	"github.com/thazelart/terraform-validator/internal/config"
+)
+
+const (
+	version = "0.0.1"
 )
 
 func main() {
-	workDir := fs.NewTerraformFolder("examples/default_config")
-	fmt.Println("Work in progress")
+	globalConfig := config.GenerateGlobalConfig(version)
 
-	fmt.Printf("We will work on that folder: %s\n", workDir.Path)
+	fmt.Printf("%v", globalConfig.WorkDir.Path)
 }

@@ -1,8 +1,8 @@
 package fs_test
 
 import (
+	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"reflect"
 	"testing"
 )
 
@@ -11,8 +11,8 @@ func TestListTerraformFiles(t *testing.T) {
 
 	expectedFileFlist := []string{"../../examples/default_config/main.tf", "../../examples/default_config/provider.tf"}
 	resultFileList := fs.ListTerraformFiles(testPath)
-	if !reflect.DeepEqual(expectedFileFlist, resultFileList) {
-		t.Errorf("Got: %v, wanted: %v", resultFileList, expectedFileFlist)
+	if diff := cmp.Diff(expectedFileFlist, resultFileList); diff != "" {
+		t.Errorf("ListTerraformFiles() mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -25,7 +25,7 @@ func TestNewTerraformFolder(t *testing.T) {
 
 	testResult := fs.NewTerraformFolder(testPath)
 
-	if !reflect.DeepEqual(testResult, expectedResult) {
-		t.Errorf("Got: %v, wanted: %v", testResult, expectedResult)
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("NewTerraformFolder() mismatch (-want +got):\n%s", diff)
 	}
 }

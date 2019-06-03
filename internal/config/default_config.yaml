@@ -1,0 +1,20 @@
+---
+files:
+  main.tf:
+    mandatory: true
+    authorized_blocks:
+  provider.tf:
+    mandatory: true
+    authorized_blocks:
+      - provider
+  variables.tf:
+    mandatory: true
+    authorized_blocks:
+      - variable
+  others:
+    mandatory: false
+    authorized_blocks:
+ensure_terraform_version: true
+ensure_providers_version: true
+ensure_readme_updated: true
+block_pattern_name: "^[a-z_]*$"

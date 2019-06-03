@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-// File is a simple structure to permit fs function overriding in others
+// Folder is a simple structure to permit fs function overriding in others
 // terraform-validator subpackages
 type Folder struct {
 	Path    string
 	Content []File
 }
 
-// listTerraformFiles get the terraform file list in the given pathF
+// ListTerraformFiles get the terraform file list in the given pathF
 func ListTerraformFiles(pathF string) []string {
 	var files []string
 

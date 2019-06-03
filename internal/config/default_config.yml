@@ -1,0 +1,17 @@
+- Files:
+  - main.tf:
+    mandatory: true
+    blocks: []
+  - provider.tf:
+    mandatory: true
+    blocks: ["provider"]
+  - variables.tf:
+    mandatory: true
+    blocks: ["variables"]
+  - default:
+    blocks: []
+- terraform:
+  ensureVersionSet: true
+  ensureProvidersVersionSet: true
+  ensureReadmeUpdates: true
+
