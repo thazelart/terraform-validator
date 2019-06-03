@@ -1,8 +1,9 @@
-// utils package bring global functions
+// Package utils bring global functions
 package utils
 
 import (
 	"log"
+	"os"
 )
 
 // LogFatal is the log.Fatal go built-in function by default. Permit to change
@@ -14,4 +15,14 @@ func EnsureOrFatal(err error) {
 	if err != nil {
 		LogFatal(err)
 	}
+}
+
+// FileExists return true is the given file exists, else false
+func FileExists(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }

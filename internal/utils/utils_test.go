@@ -22,3 +22,18 @@ func TestEnsureOrFatal(t *testing.T) {
 		t.Errorf("Got: %d error, wanted: 1", len(errs))
 	}
 }
+
+func TestFileExists(t *testing.T) {
+
+	result1 := utils.FileExists("utils_test.go")
+	result2 := utils.FileExists("file_that_does_not_exist")
+
+	// ensure result1 is true (equal)
+	if !result1 {
+		t.Errorf("Got: %v, wanted: true", result1)
+	}
+	// ensure result2 is false (not equal)
+	if result2 {
+		t.Errorf("Got: %v, wanted: false", result2)
+	}
+}
