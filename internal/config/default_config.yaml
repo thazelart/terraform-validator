@@ -3,17 +3,29 @@ files:
   main.tf:
     mandatory: true
     authorized_blocks:
-  provider.tf:
-    mandatory: true
-    authorized_blocks:
-      - provider
   variables.tf:
     mandatory: true
     authorized_blocks:
       - variable
-  others:
+  outputs.tf:
+    mandatory: true
+    authorized_blocks:
+      - output
+  provider.tf:
+    mandatory: true
+    authorized_blocks:
+      - provider
+  backend.tf:
+    mandatory: true
+    authorized_blocks:
+      - terraform
+  default:
     mandatory: false
     authorized_blocks:
+      - resource
+      - module
+      - data
+      - locals
 ensure_terraform_version: true
 ensure_providers_version: true
 ensure_readme_updated: true

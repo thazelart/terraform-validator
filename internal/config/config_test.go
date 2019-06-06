@@ -53,7 +53,20 @@ func TestGetCustomConfig(t *testing.T) {
 
 	// Second test case: with custom config
 	expectedCustomResult := config.DefaultTerraformConfig
-	expectedCustomResult.Files = nil
+	expectedCustomResult.Files = map[string]config.FileConfig{
+		"default": {
+			AuthorizedBlocks: []string{
+				"variable",
+				"output",
+				"provider",
+				"terraform",
+				"resource",
+				"module",
+				"data",
+				"locals",
+			},
+		},
+	}
 	expectedCustomResult.EnsureProvidersVersion = false
 	expectedCustomResult.EnsureReadmeUpdated = false
 
@@ -82,7 +95,20 @@ func TestGenerateGlobalConfig(t *testing.T) {
 	os.Args = []string{"terraform-validator", "../../examples/custom_config/"}
 
 	customConfig := config.DefaultTerraformConfig
-	customConfig.Files = nil
+	customConfig.Files = map[string]config.FileConfig{
+		"default": {
+			AuthorizedBlocks: []string{
+				"variable",
+				"output",
+				"provider",
+				"terraform",
+				"resource",
+				"module",
+				"data",
+				"locals",
+			},
+		},
+	}
 	customConfig.EnsureProvidersVersion = false
 	customConfig.EnsureReadmeUpdated = false
 	customFolder := fs.NewTerraformFolder("../../examples/custom_config/")

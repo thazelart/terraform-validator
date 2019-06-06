@@ -1,3 +1,13 @@
 files:
+  default:
+    authorized_blocks:
+      - variable
+      - output
+      - provider
+      - terraform
+      - resource
+      - module
+      - data
+      - locals
 ensure_providers_version: false
 ensure_readme_updated: false

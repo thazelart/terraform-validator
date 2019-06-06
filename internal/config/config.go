@@ -7,6 +7,7 @@ import (
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"gopkg.in/yaml.v3"
 	"path"
+	"strings"
 )
 
 // usage is the terraform-validator help
@@ -28,22 +29,30 @@ const usage = `
 
 // DefaultTerraformConfig is the default TerraformConfig configuration
 var DefaultTerraformConfig = TerraformConfig{
-	Files: map[string]fileConfig{
-		"main.tf": fileConfig{
+	Files: map[string]FileConfig{
+		"main.tf": FileConfig{
 			Mandatory:        true,
 			AuthorizedBlocks: nil,
 		},
-		"provider.tf": fileConfig{
-			Mandatory:        true,
-			AuthorizedBlocks: []string{"provider"},
-		},
-		"variables.tf": fileConfig{
+		"variables.tf": FileConfig{
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"variable"},
 		},
-		"others": fileConfig{
+		"outputs.tf": FileConfig{
+			Mandatory:        true,
+			AuthorizedBlocks: []string{"output"},
+		},
+		"provider.tf": FileConfig{
+			Mandatory:        true,
+			AuthorizedBlocks: []string{"provider"},
+		},
+		"backend.tf": FileConfig{
+			Mandatory:        true,
+			AuthorizedBlocks: []string{"terraform"},
+		},
+		"default": FileConfig{
 			Mandatory:        false,
-			AuthorizedBlocks: nil,
+			AuthorizedBlocks: []string{"resource", "module", "data", "locals"},
 		},
 	},
 	EnsureTerraformVersion: true,
@@ -52,23 +61,23 @@ var DefaultTerraformConfig = TerraformConfig{
 	BlockPatternName:       "^[a-z_]*$",
 }
 
-// fileConfig is the configuration for a .tf file
+// FileConfig is the configuration for a .tf file
 // AuthorizedBlocks is the list of authorized blocks in that file (for example
 // "variables", "output"...).
 // Mandatory is a boolean that define if the file is mandatory or not.
-type fileConfig struct {
+type FileConfig struct {
 	AuthorizedBlocks []string `yaml:"authorized_blocks"`
 	Mandatory        bool     `yaml:"mandatory"`
 }
 
 // TerraformConfig is the full configuration of terraform validator
-// Files is the map of .tf files defines with the fileConfig type.
+// Files is the map of .tf files defines with the FileConfig type.
 // EnsureTerraformVersion define if the terraform version has to be set or not.
 // EnsureProvidersVersion define if the providers versions has to be set or not.
 // EnsureReadmeUpdated define if we care or not if the documentation has been updated.
 // BlockPatternName is the pattern that must match all the terraform blocks name.
 type TerraformConfig struct {
-	Files                  map[string]fileConfig
+	Files                  map[string]FileConfig
 	EnsureTerraformVersion bool   `yaml:"ensure_terraform_version"`
 	EnsureProvidersVersion bool   `yaml:"ensure_providers_version"`
 	EnsureReadmeUpdated    bool   `yaml:"ensure_readme_updated"`
@@ -95,6 +104,12 @@ func ParseArgs(version string) string {
 // file in parameter. otherwise it merge them.
 func (terraformConfig TerraformConfig) ReadYaml(pathFile string) TerraformConfig {
 	tempFile := fs.NewFile(pathFile)
+	// TODO: à renommer mergeCustomAndDefault
+	// pour si tempContent terraformConfig.Files = content.Files
+	if strings.Contains(string(tempFile.Content), "files:") {
+		terraformConfig.Files = nil
+	}
+
 	err := yaml.Unmarshal(tempFile.Content, &terraformConfig)
 	utils.EnsureOrFatal(err)
 
@@ -129,6 +144,9 @@ func GenerateGlobalConfig(version string) GlobalConfig {
 	// get config
 	conf := NewTerraformConfig()
 	conf = conf.GetCustomConfig(workFolder)
+
+	_, ok := conf.Files["default"]
+	utils.OkOrFatal(ok, "FATAL Config.Files must contains at leat \"default\" !")
 
 	return GlobalConfig{WorkDir: workFolder, TerraformConfig: conf}
 }

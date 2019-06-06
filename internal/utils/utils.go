@@ -17,6 +17,13 @@ func EnsureOrFatal(err error) {
 	}
 }
 
+// OkOrFatal ensures the answer was ok or fatal
+func OkOrFatal(ok bool, message string) {
+	if !ok {
+		LogFatal(message)
+	}
+}
+
 // FileExists return true is the given file exists, else false
 func FileExists(path string) bool {
 	if _, err := os.Stat(path); err != nil {
