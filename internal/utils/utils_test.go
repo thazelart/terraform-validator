@@ -23,6 +23,24 @@ func TestEnsureOrFatal(t *testing.T) {
 	}
 }
 
+func TestOkOrFatal(t *testing.T) {
+	// After this test, replace the original fatal function
+	origLogFatal := utils.LogFatal
+	defer func() { utils.LogFatal = origLogFatal }()
+
+	errs := []string{}
+	utils.LogFatal = func(args ...interface{}) {
+		errs = append(errs, "failed")
+	}
+
+	utils.OkOrFatal(false, "failed")
+	utils.OkOrFatal(true, "failed")
+
+	if len(errs) != 1 {
+		t.Errorf("OkOrFatal() Got: %d error, wanted: 1", len(errs))
+	}
+}
+
 func TestFileExists(t *testing.T) {
 
 	result1 := utils.FileExists("utils_test.go")

@@ -4,38 +4,26 @@ import (
 	"fmt"
 	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"testing"
 )
 
-func ExampleParseArgs(t *testing.T) {
+func ExampleParseArgs() {
 	workDir := config.ParseArgs("version")
 	fmt.Printf("The path given in argument is: %s", workDir)
 	// workDir is the path given by the os.Args
 }
 
-func ExampleReadYaml(t *testing.T) {
-	var tfConfig config.TerraformConfig
-	tfConfig = tfConfig.ReadYaml("default_config.yaml")
+func ExampleGetTerraformConfig() {
+	// get folder information
+	workDir := config.ParseArgs("dev")
+	workFolder := fs.NewTerraformFolder(workDir)
 
-	fmt.Printf("Terraform config from yaml file: %+v", tfConfig)
+	// get config
+	terraformConf := config.GetTerraformConfig(workFolder)
+
+	fmt.Printf("The terraform config': %+v", terraformConf)
 }
 
-func ExampleNewTerraformConfig(t *testing.T) {
-	var tfConfig config.TerraformConfig
-	tfConfig = config.NewTerraformConfig()
-
-	fmt.Printf("Default terraform config: %+v", tfConfig.Files["main.tf"])
-}
-
-func ExampleGetCustomConfig(t *testing.T) {
-	customFolder := fs.NewTerraformFolder("../../examples/custom_config/")
-	tfConfig := config.DefaultTerraformConfig.GetCustomConfig(customFolder)
-
-	fmt.Printf("Custom terraform config: %+v", tfConfig)
-	// return the defaultTerraformCOnfig modified by the custom config
-}
-
-func ExampleGenerateGlobalConfig(t *testing.T) {
+func ExampleGenerateGlobalConfig() {
 	version := "dev"
 	globalConfig := config.GenerateGlobalConfig(version)
 
