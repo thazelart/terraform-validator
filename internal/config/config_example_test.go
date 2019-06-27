@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"testing"
 )
 
-func ExampleParseArgs(t *testing.T) {
+func ExampleParseArgs() {
 	workDir := config.ParseArgs("version")
 	fmt.Printf("The path given in argument is: %s", workDir)
 	// workDir is the path given by the os.Args
 }
 
-func ExampleGetTerraformConfig(t *testing.T) {
+func ExampleGetTerraformConfig() {
 	// get folder information
 	workDir := config.ParseArgs("dev")
 	workFolder := fs.NewTerraformFolder(workDir)
@@ -24,7 +23,7 @@ func ExampleGetTerraformConfig(t *testing.T) {
 	fmt.Printf("The terraform config': %+v", terraformConf)
 }
 
-func ExampleGenerateGlobalConfig(t *testing.T) {
+func ExampleGenerateGlobalConfig() {
 	version := "dev"
 	globalConfig := config.GenerateGlobalConfig(version)
 
