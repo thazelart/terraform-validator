@@ -3,7 +3,8 @@
 [![Build Status](https://travis-ci.com/thazelart/terraform-validator.svg?branch=master)](https://travis-ci.com/thazelart/terraform-validator) [![CodeCov](https://codecov.io/gh/thazelart/terraform-validator/branch/master/graph/badge.svg)](https://codecov.io/gh/thazelart/terraform-validator) [![Go Report Card](https://goreportcard.com/badge/github.com/thazelart/terraform-validator)](https://goreportcard.com/report/github.com/thazelart/terraform-validator)
 
 Terraform is a Go library that help you ensure that a terraform folder answer to your normes and conventions rules. The features that are developped (:heavy_check_mark:) or ready to dev (:x:) are :               
-:heavy_check_mark: ensure that the terraform block name follow a given pattern               
+<!--:heavy_check_mark: ensure that the terraform block name follow the given pattern-->
+:construction_worker: ensure that the terraform block name follow the given pattern             
 :x: ensure that a terraform version has been set               
 :x: ensure that the providers version has been set               
 :x: ensure that blocks are in a wanted files (for example output blocks mush be in `outputs.tf`)               
