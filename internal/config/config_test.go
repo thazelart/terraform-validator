@@ -19,33 +19,11 @@ func TestParseArgs(t *testing.T) {
 	}
 }
 
-func TestReadYaml(t *testing.T) {
-	expectedResult := config.DefaultTerraformConfig
-
-	var testResult config.TerraformConfig
-	testResult = testResult.ReadYaml("default_config.yaml")
-
-	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("ReadYaml() mismatch (-want +got):\n%s", diff)
-	}
-}
-
-func TestNewTerraformConfig(t *testing.T) {
-	expectedResult := config.DefaultTerraformConfig
-
-	var testResult config.TerraformConfig
-	testResult = config.NewTerraformConfig()
-
-	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("NewTerraformConfig() mismatch (-want +got):\n%s", diff)
-	}
-}
-
-func TestGetCustomConfig(t *testing.T) {
+func TestGetTerraformConfig(t *testing.T) {
 	// First test case: no custom config
-	expectedDefaultResult := config.DefaultTerraformConfig
 	defaultFolder := fs.NewTerraformFolder("../../examples/default_config/")
-	testDefaultResult := config.DefaultTerraformConfig.GetCustomConfig(defaultFolder)
+	expectedDefaultResult := config.DefaultTerraformConfig
+	testDefaultResult := config.GetTerraformConfig(defaultFolder)
 
 	if diff := cmp.Diff(expectedDefaultResult, testDefaultResult); diff != "" {
 		t.Errorf("GetCustomConfig(default) mismatch (-want +got):\n%s", diff)
@@ -55,6 +33,7 @@ func TestGetCustomConfig(t *testing.T) {
 	expectedCustomResult := config.DefaultTerraformConfig
 	expectedCustomResult.Files = map[string]config.FileConfig{
 		"default": {
+			Mandatory: false,
 			AuthorizedBlocks: []string{
 				"variable",
 				"output",
@@ -71,7 +50,7 @@ func TestGetCustomConfig(t *testing.T) {
 	expectedCustomResult.EnsureReadmeUpdated = false
 
 	customFolder := fs.NewTerraformFolder("../../examples/custom_config/")
-	testCustomResult := config.DefaultTerraformConfig.GetCustomConfig(customFolder)
+	testCustomResult := config.GetTerraformConfig(customFolder)
 
 	if diff := cmp.Diff(expectedCustomResult, testCustomResult); diff != "" {
 		t.Errorf("GetCustomConfig(custom) mismatch (-want +got):\n%s", diff)

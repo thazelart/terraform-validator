@@ -1,4 +1,4 @@
-files:
+Files:
   default:
     authorized_blocks:
       - variable

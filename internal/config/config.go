@@ -7,7 +7,7 @@ import (
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"gopkg.in/yaml.v3"
 	"path"
-	"strings"
+	"strconv"
 )
 
 // usage is the terraform-validator help
@@ -78,10 +78,10 @@ type FileConfig struct {
 // BlockPatternName is the pattern that must match all the terraform blocks name.
 type TerraformConfig struct {
 	Files                  map[string]FileConfig
-	EnsureTerraformVersion bool   `yaml:"ensure_terraform_version"`
-	EnsureProvidersVersion bool   `yaml:"ensure_providers_version"`
-	EnsureReadmeUpdated    bool   `yaml:"ensure_readme_updated"`
-	BlockPatternName       string `yaml:"block_pattern_name"`
+	EnsureTerraformVersion bool
+	EnsureProvidersVersion bool
+	EnsureReadmeUpdated    bool
+	BlockPatternName       string
 }
 
 // GlobalConfig is the global terraform validator config
@@ -98,43 +98,78 @@ func ParseArgs(version string) string {
 	return args["<path>"].(string)
 }
 
-// ReadYaml take a TerraformConfig and a path to the yaml file and return the
-// fulfilled TerraformConfig.
-// If the given TerraformConfig is empty then is take the full yaml from the
-// file in parameter. otherwise it merge them.
-func (terraformConfig TerraformConfig) ReadYaml(pathFile string) TerraformConfig {
-	tempFile := fs.NewFile(pathFile)
-	// TODO: à renommer mergeCustomAndDefault
-	// pour si tempContent terraformConfig.Files = content.Files
-	if strings.Contains(string(tempFile.Content), "files:") {
-		terraformConfig.Files = nil
+// UnmarshalYAML is a custom yaml unmarshaller for TerraformConfig
+func (c *TerraformConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var customO struct {
+		Files                  map[string]FileConfig `yaml:"Files"`
+		EnsureTerraformVersion string                `yaml:"ensure_terraform_version"`
+		EnsureProvidersVersion string                `yaml:"ensure_providers_version"`
+		EnsureReadmeUpdated    string                `yaml:"ensure_readme_updated"`
+		BlockPatternName       string                `yaml:"block_pattern_name"`
+	}
+	if err := unmarshal(&customO); err != nil {
+		return err
 	}
 
-	err := yaml.Unmarshal(tempFile.Content, &terraformConfig)
-	utils.EnsureOrFatal(err)
+	if len(customO.Files) == 0 {
+		c.Files = DefaultTerraformConfig.Files
+	} else {
+		c.Files = customO.Files
+	}
 
-	return terraformConfig
+	if customO.EnsureTerraformVersion != "" {
+		typedEnsureTerraformVersion, err := strconv.ParseBool(customO.EnsureTerraformVersion)
+		utils.EnsureOrFatal(err)
+		c.EnsureTerraformVersion = typedEnsureTerraformVersion
+	} else {
+		c.EnsureTerraformVersion = DefaultTerraformConfig.EnsureTerraformVersion
+	}
+
+	if customO.EnsureProvidersVersion != "" {
+		typedEnsureProvidersVersion, err := strconv.ParseBool(customO.EnsureProvidersVersion)
+		utils.EnsureOrFatal(err)
+		c.EnsureProvidersVersion = typedEnsureProvidersVersion
+	} else {
+		c.EnsureProvidersVersion = DefaultTerraformConfig.EnsureProvidersVersion
+	}
+
+	if customO.EnsureReadmeUpdated != "" {
+		typedEnsureReadmeUpdated, err := strconv.ParseBool(customO.EnsureReadmeUpdated)
+		utils.EnsureOrFatal(err)
+		c.EnsureReadmeUpdated = typedEnsureReadmeUpdated
+	} else {
+		c.EnsureReadmeUpdated = DefaultTerraformConfig.EnsureReadmeUpdated
+	}
+
+	if customO.BlockPatternName != "" {
+		c.BlockPatternName = customO.BlockPatternName
+	} else {
+		c.BlockPatternName = DefaultTerraformConfig.BlockPatternName
+	}
+
+	return nil
 }
 
-// NewTerraformConfig return TerraformConfig with the default value (DefaultTerraformConfig)
-func NewTerraformConfig() TerraformConfig {
-	return DefaultTerraformConfig
-}
-
-// GetCustomConfig take a TerraformConfig (generally the default one) and get the custom
-// config if set. If the custom config is set it merge the default and the custom configurations.
-func (terraformConfig TerraformConfig) GetCustomConfig(workDir fs.Folder) TerraformConfig {
+// GetTerraformConfig get the terraform-validator config. If terraform-validator.yaml
+// exists it merge the default and the custom config
+func GetTerraformConfig(workDir fs.Folder) TerraformConfig {
 	customConfigFile := path.Join(workDir.Path, "terraform-validator.yaml")
+
 	if !utils.FileExists(customConfigFile) {
 		fmt.Printf("Working on %s with default configuration\n", workDir.Path)
-		return terraformConfig
+		return DefaultTerraformConfig
 	}
 	fmt.Printf("Working on %s with custom configuration\n", workDir.Path)
-	terraformConfig = terraformConfig.ReadYaml(customConfigFile)
-	return terraformConfig
+	tempFile := fs.NewFile(customConfigFile)
+
+	var customConfig TerraformConfig
+	err := yaml.Unmarshal(tempFile.Content, &customConfig)
+	utils.EnsureOrFatal(err)
+
+	return customConfig
 }
 
-// GenerateConfig generates the terraform-validator global config.
+// GenerateGlobalConfig generates the terraform-validator global config.
 // It takes the WorkDir needed informations and the TerraformConfig (default or custom)
 func GenerateGlobalConfig(version string) GlobalConfig {
 	// get folder information
@@ -142,8 +177,7 @@ func GenerateGlobalConfig(version string) GlobalConfig {
 	workFolder := fs.NewTerraformFolder(workDir)
 
 	// get config
-	conf := NewTerraformConfig()
-	conf = conf.GetCustomConfig(workFolder)
+	conf := GetTerraformConfig(workFolder)
 
 	_, ok := conf.Files["default"]
 	utils.OkOrFatal(ok, "FATAL Config.Files must contains at leat \"default\" !")
