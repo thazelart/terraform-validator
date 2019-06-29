@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/pkg/hcl"
+	"os"
 )
 
 const (
@@ -60,10 +61,25 @@ const (
 )
 
 func main() {
+	exitCode := 0
+	defer func() { os.Exit(exitCode) }()
+
 	globalConfig := config.GenerateGlobalConfig(version)
 
 	for _, file := range globalConfig.WorkDir.Content {
+		var errors []error
+
 		tfParsedContent := hcl.InitTerraformFileParsedContent(file)
-		fmt.Printf("%s: %+v\n", file.Path, tfParsedContent)
+
+		tfParsedContent.VerifyBlockNames(globalConfig, &errors)
+
+		if len(errors) > 0 {
+			exitCode = 1
+			fmt.Printf("%s contains errors:\n", file.Path)
+			for _, err := range errors {
+				fmt.Println(err)
+			}
+		}
+
 	}
 }

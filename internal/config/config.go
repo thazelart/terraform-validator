@@ -58,7 +58,7 @@ var DefaultTerraformConfig = TerraformConfig{
 	EnsureTerraformVersion: true,
 	EnsureProvidersVersion: true,
 	EnsureReadmeUpdated:    true,
-	BlockPatternName:       "^[a-z_]*$",
+	BlockPatternName:       "^[a-z0-9_]*$",
 }
 
 // FileConfig is the configuration for a .tf file

@@ -29,4 +29,4 @@ Files:
 ensure_terraform_version: true
 ensure_providers_version: true
 ensure_readme_updated: true
-block_pattern_name: "^[a-z_]*$"
+block_pattern_name: "^[a-z0-9_]*$"
