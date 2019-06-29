@@ -2,6 +2,7 @@ package hcl_test
 
 import (
 	"fmt"
+	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/fs"
 	"github.com/thazelart/terraform-validator/pkg/hcl"
 )
@@ -31,5 +32,23 @@ func ExampleGetBlockNamesByType() {
 	for _, blockT := range hcl.TerraformBlockTypes {
 		blockNames := hcl.GetBlockNamesByType(hclContent, blockT)
 		fmt.Printf("Block type %s contains those elements : %v", blockT, blockNames)
+	}
+}
+
+func ExampleTerraformFileParsedContent() {
+	var globalConfig config.GlobalConfig
+
+	for _, file := range globalConfig.WorkDir.Content {
+		var errors []error
+
+		tfParsedContent := hcl.InitTerraformFileParsedContent(file)
+		tfParsedContent.VerifyBlockNames(globalConfig, &errors)
+
+		if len(errors) > 0 {
+			fmt.Printf("%s contains errors:\n", file.Path)
+			for _, err := range errors {
+				fmt.Println(err)
+			}
+		}
 	}
 }
