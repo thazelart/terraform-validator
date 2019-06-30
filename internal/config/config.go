@@ -156,10 +156,10 @@ func GetTerraformConfig(workDir fs.Folder) TerraformConfig {
 	customConfigFile := path.Join(workDir.Path, "terraform-validator.yaml")
 
 	if !utils.FileExists(customConfigFile) {
-		fmt.Printf("Working on %s with default configuration\n", workDir.Path)
+		fmt.Println("INFO: using default configuration")
 		return DefaultTerraformConfig
 	}
-	fmt.Printf("Working on %s with custom configuration\n", workDir.Path)
+	fmt.Println("INFO: using custom configuration")
 	tempFile := fs.NewFile(customConfigFile)
 
 	var customConfig TerraformConfig
