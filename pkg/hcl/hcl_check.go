@@ -17,9 +17,7 @@ func (terraformFileParsedContent TerraformFileParsedContent) VerifyBlockNames(
 		for _, blockName := range subBlocks {
 			matched, _ := regexp.MatchString(blockPatternName, blockName)
 			if !matched {
-				*errs = append(*errs,
-					fmt.Errorf("  %s block \"%s\" does not match \"%s\"",
-						blockType, blockName, blockPatternName))
+				*errs = append(*errs, fmt.Errorf("%s (%s)", blockName, blockType))
 			}
 		}
 	}
@@ -39,7 +37,7 @@ func (terraformFileParsedContent TerraformFileParsedContent) VerifyBlocksInFiles
 	for blockType, _ := range terraformFileParsedContent {
 		authorized := utils.Contains(authorizedBlocks, blockType)
 		if !authorized {
-			*errs = append(*errs, fmt.Errorf("  %s blocks are not authorized", blockType))
+			*errs = append(*errs, fmt.Errorf("%s", blockType))
 		}
 	}
 }

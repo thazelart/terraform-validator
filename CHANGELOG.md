@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [1.2.0]
+### Added
+- Ensure all mandatory files are present
+
 ## [1.1.0]
 ### Added
 - Checks that blocks contained in .tf files are authorized

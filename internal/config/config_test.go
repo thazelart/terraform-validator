@@ -8,6 +8,7 @@ import (
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"gopkg.in/yaml.v3"
 	"os"
+	"sort"
 	"testing"
 )
 
@@ -156,7 +157,7 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 	testResult, _ := testGC.GetAuthorizedBlocks("variables.tf")
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("TestGetAuthorizedBlocks(knownFile) mismatch (-want +got):\n%s", diff)
+		t.Errorf("GetAuthorizedBlocks(knownFile) mismatch (-want +got):\n%s", diff)
 	}
 
 	// test2 with unknown filename
@@ -164,7 +165,7 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 	testResult, _ = testGC.GetAuthorizedBlocks("foo.tf")
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("TestGetAuthorizedBlocks(unknownFile) mismatch (-want +got):\n%s", diff)
+		t.Errorf("GetAuthorizedBlocks(unknownFile) mismatch (-want +got):\n%s", diff)
 	}
 
 	// test3 with unknown filename and no default
@@ -173,8 +174,48 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 	_, testErrorResult := testGC.GetAuthorizedBlocks("foo.tf")
 
 	if expectedErrorResult == nil {
-		t.Errorf("TestGetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n- %#v\n+ %+v",
+		t.Errorf("GetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n- %#v\n+ %+v",
 			expectedErrorResult, testErrorResult)
 	}
+}
 
+func TestGetMandatoryFiles(t *testing.T) {
+	var testGC config.GlobalConfig
+	testGC.TerraformConfig = config.DefaultTerraformConfig
+
+	// set default as mandatory, it must not be in expectedResult
+	tmpDefault := testGC.TerraformConfig.Files["default"]
+	tmpDefault.Mandatory = true
+	testGC.TerraformConfig.Files["default"] = tmpDefault
+
+	expectedResult := []string{"backend.tf", "main.tf", "outputs.tf", "provider.tf", "variables.tf"}
+
+	testResult := testGC.GetMandatoryFiles()
+	sort.Strings(testResult)
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetMandatoryFiles() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestGetFileNameList(t *testing.T) {
+	var testGC config.GlobalConfig
+
+	foo := fs.File{Path: "/path/to/foo.tf", Content: []byte{}}
+	bar := fs.File{Path: "/path/to/bar.tf", Content: []byte{}}
+
+	var fileList []fs.File
+	fileList = append(fileList, foo)
+	fileList = append(fileList, bar)
+
+	testGC.WorkDir = fs.Folder{Path: "/path/to", Content: fileList}
+
+	expectedResult := []string{"bar.tf", "foo.tf"}
+
+	testResult := testGC.GetFileNameList()
+	sort.Strings(testResult)
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetMandatoryFiles() mismatch (-want +got):\n%s", diff)
+	}
 }
