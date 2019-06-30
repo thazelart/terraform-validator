@@ -73,6 +73,8 @@ func main() {
 
 		tfParsedContent.VerifyBlockNames(globalConfig, &errors)
 
+		tfParsedContent.VerifyBlocksInFiles(globalConfig, file, &errors)
+
 		if len(errors) > 0 {
 			exitCode = 1
 			fmt.Printf("%s contains errors:\n", file.Path)

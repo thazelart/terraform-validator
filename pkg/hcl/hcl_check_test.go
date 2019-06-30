@@ -2,8 +2,10 @@ package hcl_test
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/config"
+	"github.com/thazelart/terraform-validator/internal/fs"
 	"github.com/thazelart/terraform-validator/pkg/hcl"
 	"testing"
 )
@@ -43,5 +45,45 @@ func TestVerifyBlockNames(t *testing.T) {
 	tfParsedContent.VerifyBlockNames(globalConfig, &testResult)
 	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
 		t.Errorf("VerifyBlockNames mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestVerifyBlocksInFiles(t *testing.T) {
+	var testResult []error
+	var testFile fs.File
+	var globalConfig config.GlobalConfig
+	globalConfig.TerraformConfig = config.DefaultTerraformConfig
+
+	tfParsedContent := hcl.TerraformFileParsedContent{
+		"variable": []string{"one_map", "a_list"},
+	}
+
+	// First with known filename
+	var expectedResult []error
+	testFile.Path = "/path/variables.tf"
+	tfParsedContent.VerifyBlocksInFiles(globalConfig, testFile, &testResult)
+
+	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
+		t.Errorf("VerifyBlocksInFiles(variables.tf) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 with unknown filename
+	expectedResult = append(expectedResult, fmt.Errorf("  variables blocks are not authorized"))
+	testFile.Path = "/path/main.tf"
+	tfParsedContent.VerifyBlocksInFiles(globalConfig, testFile, &testResult)
+
+	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
+		t.Errorf("VerifyBlocksInFiles(main.tf) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test3 with unknown filename and no default
+	delete(globalConfig.TerraformConfig.Files, "default")
+	expectedResult = append(expectedResult,
+		fmt.Errorf("  cannot check authorized blocks, their is no file configuration for foo.tf nor default"))
+	testFile.Path = "/path/foo.tf"
+	tfParsedContent.VerifyBlocksInFiles(globalConfig, testFile, &testResult)
+
+	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
+		t.Errorf("VerifyBlocksInFiles(foo.tf) mismatch (-want +got):\n%s", diff)
 	}
 }

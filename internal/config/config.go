@@ -184,3 +184,20 @@ func GenerateGlobalConfig(version string) GlobalConfig {
 
 	return GlobalConfig{WorkDir: workFolder, TerraformConfig: conf}
 }
+
+// GetAuthorizedBlocks gets you the authorized blocks for the given filename.
+// If the filename is not configure it gets you the dfault configuration.
+// If their is no default either, return you an error.
+func (globalConfig GlobalConfig) GetAuthorizedBlocks(filename string) ([]string, error) {
+	_, ok := globalConfig.TerraformConfig.Files[filename]
+	if ok {
+		return globalConfig.TerraformConfig.Files[filename].AuthorizedBlocks, nil
+	} else {
+		_, ok := globalConfig.TerraformConfig.Files["default"]
+		if ok {
+			return globalConfig.TerraformConfig.Files["default"].AuthorizedBlocks, nil
+		} else {
+			return nil, fmt.Errorf("  cannot check authorized blocks, their is no file configuration for %s nor default", filename)
+		}
+	}
+}
