@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"io/ioutil"
+	"path/filepath"
 )
 
 // File is a simple structure to permit fs function overriding in others
@@ -20,6 +21,11 @@ func NewFile(path string) File {
 	utils.EnsureOrFatal(err)
 
 	return File{Path: path, Content: content}
+}
+
+// GetFilename return you the filename instead of it's full path
+func (file File) GetFilename() string {
+	return filepath.Base(file.Path)
 }
 
 // FileEqual ensures that the two files have the same content

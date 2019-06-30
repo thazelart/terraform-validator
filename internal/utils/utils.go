@@ -33,3 +33,13 @@ func FileExists(path string) bool {
 	}
 	return true
 }
+
+// Contains check if a list contains a given string
+func Contains(list []string, string string) bool {
+	for _, elem := range list {
+		if elem == string {
+			return true
+		}
+	}
+	return false
+}

@@ -18,6 +18,19 @@ func TestNewFile(t *testing.T) {
 	}
 }
 
+// GetFilename return you the filename instead of it's full path
+func TestGetFilename(t *testing.T) {
+	var testFile fs.File
+	testFile.Path = "/home/thazelart/terraform-validator/foo.txt"
+
+	expectedResult := "foo.txt"
+	testResult := testFile.GetFilename()
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetFilename() mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestFileEqual(t *testing.T) {
 	file1 := fs.NewFile("file_test.go")
 	file2 := fs.NewFile("file_example_test.go")

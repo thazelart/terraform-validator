@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"errors"
+	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"testing"
 )
@@ -53,5 +54,23 @@ func TestFileExists(t *testing.T) {
 	// ensure result2 is false (not equal)
 	if result2 {
 		t.Errorf("Got: %v, wanted: false", result2)
+	}
+}
+
+func TestContains(t *testing.T) {
+	list := []string{"foo", "bar"}
+	// test1 true
+	expectedResult := true
+	testResult := utils.Contains(list, "foo")
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("Contains(foo) mismatch (-want +got):\n%s", diff)
+	}
+	// test2 false
+	expectedResult = false
+	testResult = utils.Contains(list, "foobar")
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("Contains(foo) mismatch (-want +got):\n%s", diff)
 	}
 }
