@@ -7,7 +7,7 @@ Terraform is a Go library that help you ensure that a terraform folder answer to
 :heavy_check_mark: ensure that blocks are in a wanted files (for example output blocks must be in `outputs.tf`)               
 :heavy_check_mark: ensure that mandatory `.tf` files are present               
 :heavy_check_mark: ensure that a terraform version has been set               
-:x: ensure that the providers version has been set               
+:heavy_check_mark: ensure that the providers version has been set               
 :x: ensure `terraform fmt` is ok               
 :x: ensure Readme was updated (if you are using [terraform-docs](https://github.com/segmentio/terraform-docs))               
 

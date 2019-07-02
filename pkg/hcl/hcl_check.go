@@ -50,3 +50,17 @@ func (terraformFileParsedContent TerraformFileParsedContent) ContainsTerraformVe
 	}
 	return utils.Contains(terraformBlock, "required_version")
 }
+
+// ContainsProvidersVersion return nil if all providers versions are set else a slice of error
+func (terraformFileParsedContent TerraformFileParsedContent) ContainsProvidersVersion(file fs.File, errs *[]error) {
+	_, providerBlockPresent := terraformFileParsedContent["provider"]
+	if !providerBlockPresent {
+		return
+	}
+	providerContent := GetProviderConfiguration(file)
+	for provider, configurations := range providerContent {
+		if !utils.Contains(configurations, "version") {
+			*errs = append(*errs, fmt.Errorf("%s", provider))
+		}
+	}
+}

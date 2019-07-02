@@ -127,5 +127,17 @@ func TestInitTerraformFileParsedContent(t *testing.T) {
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
 		t.Errorf("InitTerraformFileParsedContent mismatch (-want +got):\n%s", diff)
 	}
+}
 
+func TestGetProviderConfiguration(t *testing.T) {
+	testFile := fs.File{Path: "/tmp/main.tf", Content: []byte(fileContent)}
+	expectedResult := map[string][]string{
+		"google": []string{"project", "version"},
+		"github": []string{"organization"},
+	}
+
+	testResult := hcl.GetProviderConfiguration(testFile)
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetProviderConfiguration mismatch (-want +got):\n%s", diff)
+	}
 }
