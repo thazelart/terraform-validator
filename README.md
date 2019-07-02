@@ -3,19 +3,19 @@
 [![Build Status](https://travis-ci.com/thazelart/terraform-validator.svg?branch=master)](https://travis-ci.com/thazelart/terraform-validator) [![CodeCov](https://codecov.io/gh/thazelart/terraform-validator/branch/master/graph/badge.svg)](https://codecov.io/gh/thazelart/terraform-validator) [![Go Report Card](https://goreportcard.com/badge/github.com/thazelart/terraform-validator)](https://goreportcard.com/report/github.com/thazelart/terraform-validator)
 
 Terraform is a Go library that help you ensure that a terraform folder answer to your normes and conventions rules. The features that are developped (:heavy_check_mark:), in progress (:construction_worker:) or ready to dev (:x:) are :             
-:heavy_check_mark: ensure that the terraform block name follow the given pattern             
+:heavy_check_mark: ensure that the terraform blocknames follow the given pattern             
 :heavy_check_mark: ensure that blocks are in a wanted files (for example output blocks must be in `outputs.tf`)               
 :heavy_check_mark: ensure that mandatory `.tf` files are present               
-:x: ensure that a terraform version has been set               
+:heavy_check_mark: ensure that a terraform version has been set               
 :x: ensure that the providers version has been set               
-:x: ensure Readme was updated (if you are using [terraform-docs](https://github.com/segmentio/terraform-docs))               
 :x: ensure `terraform fmt` is ok               
+:x: ensure Readme was updated (if you are using [terraform-docs](https://github.com/segmentio/terraform-docs))               
 
 ## Install
 
 Prerequisite: install [Go](https://golang.org/).
 
-To add terraform-validator, we recommend using a Go dependency manager such as
+To add terraform-validator, I recommend using a Go dependency manager such as
 [dep](https://github.com/golang/dep):
 
 ```bash
@@ -97,8 +97,8 @@ files:
       - locals
 # you don't want to check the terraform version
 ensure_terraform_version: false
-# you prefere snake case for terraform block names
-block_pattern_name: "^[a-z0-9_]*$"
+# you prefere kebab case for terraform blocknames
+block_pattern_name: "^[a-z0-9-]*$"
 ```
 The non present parameters in your `terraform-validator.yaml` will take the default value.
 

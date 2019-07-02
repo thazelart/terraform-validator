@@ -87,3 +87,39 @@ func TestVerifyBlocksInFiles(t *testing.T) {
 		t.Errorf("VerifyBlocksInFiles(foo.tf) mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestContainsTerraformVersion(t *testing.T) {
+	// test1 no terraform blocks
+	tfParsedContent := hcl.TerraformFileParsedContent{
+		"provider": []string{"google", "github"},
+	}
+	expectedResult := false
+
+	testResult := tfParsedContent.ContainsTerraformVersion()
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("TestVerifyTerraformVersion(noTerraform) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 no terraform version tfParsedContent
+	tfParsedContent = hcl.TerraformFileParsedContent{
+		"terraform": []string{"backend"},
+		"provider":  []string{"google", "github"},
+	}
+	expectedResult = false
+
+	testResult = tfParsedContent.ContainsTerraformVersion()
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("TestVerifyTerraformVersion(noTerraformVersion) mismatch (-want +got):\n%s", diff)
+	}
+	// test3 terraform version set
+	tfParsedContent = hcl.TerraformFileParsedContent{
+		"terraform": []string{"required_version", "backend"},
+		"provider":  []string{"google", "github"},
+	}
+	expectedResult = true
+
+	testResult = tfParsedContent.ContainsTerraformVersion()
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("TestVerifyTerraformVersion(terraformVersion) mismatch (-want +got):\n%s", diff)
+	}
+}
