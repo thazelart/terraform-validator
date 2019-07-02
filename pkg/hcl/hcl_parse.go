@@ -53,7 +53,6 @@ func getSubBlock(hclContent interface{}) ([]string, interface{}) {
 	utils.OkOrFatal(ok, "FATAL Unable to decode hclContent into []map[string]interface{}")
 
 	var keys []string
-	//blocks :=  make(map[string]interface{})
 	var blocks []map[string]interface{}
 
 	// For each superBlock inside blockType
@@ -106,4 +105,24 @@ func InitTerraformFileParsedContent(file fs.File) TerraformFileParsedContent {
 	}
 
 	return terraformFileParsedContent
+}
+
+// GetProviderConfiguration get the configuration keys inside the provider blocks of the file
+func GetProviderConfiguration(file fs.File) map[string][]string {
+	result := make(map[string][]string)
+
+	hclContent := ParseContent(file)
+
+	typedProviders, ok := hclContent["provider"].([]map[string]interface{})
+	utils.OkOrFatal(ok, "FATAL Unable to decode hclContent[\"provider\"] into []map[string]interface{}")
+
+	for _, superBlock := range typedProviders {
+		for providerName, configurations := range superBlock {
+			configurations, _ := getSubBlock(configurations)
+
+			result[providerName] = configurations
+		}
+	}
+
+	return result
 }

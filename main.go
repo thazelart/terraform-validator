@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	version = "1.2.1"
+	version = "1.3.0"
 )
 
 var (
@@ -25,6 +25,7 @@ func main() {
 	for _, file := range globalConfig.WorkDir.Content {
 		var blockNamesErrors []error
 		var blocksInFilesErrors []error
+		var providersVersionErrors []error
 
 		tfParsedContent := hcl.InitTerraformFileParsedContent(file)
 
@@ -36,9 +37,19 @@ func main() {
 			isTerraformVersionSet = tfParsedContent.ContainsTerraformVersion()
 		}
 
-		if len(blockNamesErrors) > 0 || len(blocksInFilesErrors) > 0 {
+		if globalConfig.TerraformConfig.EnsureProvidersVersion {
+			tfParsedContent.ContainsProvidersVersion(file, &providersVersionErrors)
+		}
+
+		if len(blockNamesErrors) > 0 || len(blocksInFilesErrors) > 0 || len(providersVersionErrors) > 0 {
 			exitCode = 1
 			fmt.Printf("\nERROR: %s misformed:\n", file.Path)
+			if len(providersVersionErrors) > 0 {
+				fmt.Printf("  Unversioned provider(s):\n")
+				for _, err := range providersVersionErrors {
+					fmt.Printf("    - %s\n", err.Error())
+				}
+			}
 			if len(blockNamesErrors) > 0 {
 				fmt.Printf("  Unmatching \"%s\" pattern blockname(s):\n",
 					globalConfig.TerraformConfig.BlockPatternName)

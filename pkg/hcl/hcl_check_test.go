@@ -68,7 +68,7 @@ func TestVerifyBlocksInFiles(t *testing.T) {
 	}
 
 	// test2 with unknown filename
-	expectedResult = append(expectedResult, fmt.Errorf("  variables blocks are not authorized"))
+	expectedResult = append(expectedResult, fmt.Errorf("variables blocks are not authorized"))
 	testFile.Path = "/path/main.tf"
 	tfParsedContent.VerifyBlocksInFiles(globalConfig, testFile, &testResult)
 
@@ -97,7 +97,7 @@ func TestContainsTerraformVersion(t *testing.T) {
 
 	testResult := tfParsedContent.ContainsTerraformVersion()
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("TestVerifyTerraformVersion(noTerraform) mismatch (-want +got):\n%s", diff)
+		t.Errorf("ContainsTerraformVersion(noTerraform) mismatch (-want +got):\n%s", diff)
 	}
 
 	// test2 no terraform version tfParsedContent
@@ -109,7 +109,7 @@ func TestContainsTerraformVersion(t *testing.T) {
 
 	testResult = tfParsedContent.ContainsTerraformVersion()
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("TestVerifyTerraformVersion(noTerraformVersion) mismatch (-want +got):\n%s", diff)
+		t.Errorf("ContainsTerraformVersion(noTerraformVersion) mismatch (-want +got):\n%s", diff)
 	}
 	// test3 terraform version set
 	tfParsedContent = hcl.TerraformFileParsedContent{
@@ -120,6 +120,59 @@ func TestContainsTerraformVersion(t *testing.T) {
 
 	testResult = tfParsedContent.ContainsTerraformVersion()
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("TestVerifyTerraformVersion(terraformVersion) mismatch (-want +got):\n%s", diff)
+		t.Errorf("ContainsTerraformVersion(terraformVersion) mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestContainsProvidersVersion(t *testing.T) {
+	// test1 no provider block
+	tfParsedContent := hcl.TerraformFileParsedContent{
+		"terraform": []string{"backend"},
+	}
+	tfFileContent := `terraform {
+	  required_version = "~> 1.0"
+	}`
+	tfFile := fs.File{Path: "foo.tf", Content: []byte(tfFileContent)}
+	var expectedResult []error
+	var testResult []error
+
+	tfParsedContent.ContainsProvidersVersion(tfFile, &testResult)
+	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
+		t.Errorf("ContainsTerraformVersion(noProvider) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 provider with version
+	tfParsedContent = hcl.TerraformFileParsedContent{
+		"provider": []string{"google"},
+	}
+	tfFileContent = `provider "google" {
+		project = "my-rpoject-xdfg"
+		version = "~> 1.0"
+	}`
+	tfFile = fs.File{Path: "foo.tf", Content: []byte(tfFileContent)}
+
+	tfParsedContent.ContainsProvidersVersion(tfFile, &testResult)
+	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
+		t.Errorf("ContainsTerraformVersion(providerWithVersion) mismatch (-want +got):\n%s", diff)
+	}
+
+	// Test3 provider without version
+	tfParsedContent = hcl.TerraformFileParsedContent{
+		"provider": []string{"google", "github"},
+	}
+	tfFileContent = `provider "google" {
+		project = "my-rpoject-xdfg"
+		version = "~> 1.0"
+	}
+
+	provider "github" {
+		organization = "thazelart"
+	}`
+	tfFile = fs.File{Path: "foo.tf", Content: []byte(tfFileContent)}
+	expectedResult = append(expectedResult, fmt.Errorf("github"))
+
+	tfParsedContent.ContainsProvidersVersion(tfFile, &testResult)
+	if diff := cmp.Diff(len(expectedResult), len(testResult)); diff != "" {
+		t.Errorf("ContainsTerraformVersion(providerWithVersion) mismatch (-want +got):\n%s", diff)
 	}
 }
