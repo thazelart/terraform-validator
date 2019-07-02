@@ -9,7 +9,11 @@ import (
 )
 
 const (
-	version     = "1.2.1"
+	version = "1.2.1"
+)
+
+var (
+	isTerraformVersionSet = false
 )
 
 func main() {
@@ -26,6 +30,11 @@ func main() {
 
 		tfParsedContent.VerifyBlockNames(globalConfig, &blockNamesErrors)
 		tfParsedContent.VerifyBlocksInFiles(globalConfig, file, &blocksInFilesErrors)
+
+		// if terraform version not yet set verify if that file contain it
+		if !isTerraformVersionSet && globalConfig.TerraformConfig.EnsureTerraformVersion {
+			isTerraformVersionSet = tfParsedContent.ContainsTerraformVersion()
+		}
 
 		if len(blockNamesErrors) > 0 || len(blocksInFilesErrors) > 0 {
 			exitCode = 1
@@ -62,5 +71,9 @@ func main() {
 		for _, err := range mandatoryErrors {
 			fmt.Printf("  - %s\n", err.Error())
 		}
+	}
+
+	if !isTerraformVersionSet && globalConfig.TerraformConfig.EnsureTerraformVersion {
+		fmt.Println("\nERROR: Terraform version was not set")
 	}
 }

@@ -41,3 +41,12 @@ func (terraformFileParsedContent TerraformFileParsedContent) VerifyBlocksInFiles
 		}
 	}
 }
+
+// ContainsTerraformVersion return true if the terraform version was set
+func (terraformFileParsedContent TerraformFileParsedContent) ContainsTerraformVersion() bool {
+	terraformBlock, terraformBlockPresent := terraformFileParsedContent["terraform"]
+	if !terraformBlockPresent {
+		return false
+	}
+	return utils.Contains(terraformBlock, "required_version")
+}
