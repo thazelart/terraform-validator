@@ -58,7 +58,7 @@ files:
     mandatory: true
     authorized_blocks:
       - output
-  provider.tf:
+  providers.tf:
     mandatory: true
     authorized_blocks:
       - provider

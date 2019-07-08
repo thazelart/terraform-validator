@@ -188,7 +188,7 @@ func TestGetMandatoryFiles(t *testing.T) {
 	tmpDefault.Mandatory = true
 	testGC.TerraformConfig.Files["default"] = tmpDefault
 
-	expectedResult := []string{"backend.tf", "main.tf", "outputs.tf", "provider.tf", "variables.tf"}
+	expectedResult := []string{"backend.tf", "main.tf", "outputs.tf", "providers.tf", "variables.tf"}
 
 	testResult := testGC.GetMandatoryFiles()
 	sort.Strings(testResult)

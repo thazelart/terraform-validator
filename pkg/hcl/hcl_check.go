@@ -14,6 +14,9 @@ func (terraformFileParsedContent TerraformFileParsedContent) VerifyBlockNames(
 	blockPatternName := config.TerraformConfig.BlockPatternName
 
 	for blockType, subBlocks := range terraformFileParsedContent {
+		if utils.Contains([]string{"provider", "terraform"}, blockType) {
+			continue
+		}
 		for _, blockName := range subBlocks {
 			matched, _ := regexp.MatchString(blockPatternName, blockName)
 			if !matched {

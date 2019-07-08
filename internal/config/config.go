@@ -42,7 +42,7 @@ var DefaultTerraformConfig = TerraformConfig{
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"output"},
 		},
-		"provider.tf": FileConfig{
+		"providers.tf": FileConfig{
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"provider"},
 		},
@@ -101,7 +101,7 @@ func ParseArgs(version string) string {
 // UnmarshalYAML is a custom yaml unmarshaller for TerraformConfig
 func (c *TerraformConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var customO struct {
-		Files                  map[string]FileConfig `yaml:"Files"`
+		Files                  map[string]FileConfig `yaml:"files"`
 		EnsureTerraformVersion string                `yaml:"ensure_terraform_version"`
 		EnsureProvidersVersion string                `yaml:"ensure_providers_version"`
 		EnsureReadmeUpdated    string                `yaml:"ensure_readme_updated"`
@@ -111,10 +111,10 @@ func (c *TerraformConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
 		return err
 	}
 
-	if len(customO.Files) == 0 {
-		c.Files = DefaultTerraformConfig.Files
-	} else {
+	if len(customO.Files) != 0 {
 		c.Files = customO.Files
+	} else {
+		c.Files = DefaultTerraformConfig.Files
 	}
 
 	if customO.EnsureTerraformVersion != "" {
