@@ -44,7 +44,7 @@ func TestUnmarshalYAML(t *testing.T) {
 	expectedCustomResult.EnsureProvidersVersion = false
 	expectedCustomResult.EnsureReadmeUpdated = false
 
-	customConfigFile := fs.NewFile("../../examples/custom_config/terraform-validator.yaml")
+	customConfigFile := fs.NewFile("../../examples/custom_config/.terraform-validator.yaml")
 	var testCustomResult config.TerraformConfig
 	err := yaml.Unmarshal(customConfigFile.Content, &testCustomResult)
 	utils.EnsureOrFatal(err)
