@@ -79,7 +79,7 @@ ensure_readme_updated: true
 block_pattern_name: "^[a-z0-9_]*$"
 ```
 
-You can set you own configuration by adding a `terraform-validator.yaml` file at the root of your terraform folder.
+You can set you own configuration by adding a `.terraform-validator.yaml` file at the root of your terraform folder.
 For example :
 ```yaml
 ---
@@ -100,7 +100,7 @@ ensure_terraform_version: false
 # you prefere kebab case for terraform blocknames
 block_pattern_name: "^[a-z0-9-]*$"
 ```
-The non present parameters in your `terraform-validator.yaml` will take the default value.
+The non present parameters in your `.terraform-validator.yaml` will take the default value.
 
 ## Authors
 [Thibault Hazelart](https://github.com/thazelart)

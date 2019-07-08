@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/docopt/docopt-go"
+	"github.com/docopt/docopt.go"
 	"github.com/thazelart/terraform-validator/internal/fs"
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"gopkg.in/yaml.v3"
@@ -153,7 +153,7 @@ func (c *TerraformConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
 // GetTerraformConfig get the terraform-validator config. If terraform-validator.yaml
 // exists it merge the default and the custom config
 func GetTerraformConfig(workDir fs.Folder) TerraformConfig {
-	customConfigFile := path.Join(workDir.Path, "terraform-validator.yaml")
+	customConfigFile := path.Join(workDir.Path, ".terraform-validator.yaml")
 
 	if !utils.FileExists(customConfigFile) {
 		fmt.Println("INFO: using default configuration")
