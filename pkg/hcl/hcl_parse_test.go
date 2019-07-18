@@ -137,6 +137,7 @@ func TestGetProviderConfiguration(t *testing.T) {
 	}
 
 	testResult := hcl.GetProviderConfiguration(testFile)
+	sort.Strings(testResult["google"])
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
 		t.Errorf("GetProviderConfiguration mismatch (-want +got):\n%s", diff)
 	}
