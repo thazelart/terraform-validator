@@ -30,27 +30,27 @@ const usage = `
 // DefaultTerraformConfig is the default TerraformConfig configuration
 var DefaultTerraformConfig = TerraformConfig{
 	Files: map[string]FileConfig{
-		"main.tf": FileConfig{
+		"main.tf": {
 			Mandatory:        true,
 			AuthorizedBlocks: nil,
 		},
-		"variables.tf": FileConfig{
+		"variables.tf": {
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"variable"},
 		},
-		"outputs.tf": FileConfig{
+		"outputs.tf": {
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"output"},
 		},
-		"providers.tf": FileConfig{
+		"providers.tf": {
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"provider"},
 		},
-		"backend.tf": FileConfig{
+		"backend.tf": {
 			Mandatory:        true,
 			AuthorizedBlocks: []string{"terraform"},
 		},
-		"default": FileConfig{
+		"default": {
 			Mandatory:        false,
 			AuthorizedBlocks: []string{"resource", "module", "data", "locals"},
 		},
@@ -192,14 +192,14 @@ func (globalConfig GlobalConfig) GetAuthorizedBlocks(filename string) ([]string,
 	_, ok := globalConfig.TerraformConfig.Files[filename]
 	if ok {
 		return globalConfig.TerraformConfig.Files[filename].AuthorizedBlocks, nil
-	} else {
-		_, ok := globalConfig.TerraformConfig.Files["default"]
-		if ok {
-			return globalConfig.TerraformConfig.Files["default"].AuthorizedBlocks, nil
-		} else {
-			return nil, fmt.Errorf("  cannot check authorized blocks, their is no file configuration for %s nor default", filename)
-		}
 	}
+
+	_, ok = globalConfig.TerraformConfig.Files["default"]
+	if ok {
+		return globalConfig.TerraformConfig.Files["default"].AuthorizedBlocks, nil
+	}
+
+	return nil, fmt.Errorf("  cannot check authorized blocks, their is no file configuration for %s nor default", filename)
 }
 
 // GetMandatoryFiles get the mandatory file list from the globalConfig

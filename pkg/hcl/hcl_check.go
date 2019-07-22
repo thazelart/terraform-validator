@@ -37,7 +37,7 @@ func (terraformFileParsedContent TerraformFileParsedContent) VerifyBlocksInFiles
 		return
 	}
 
-	for blockType, _ := range terraformFileParsedContent {
+	for blockType := range terraformFileParsedContent {
 		authorized := utils.Contains(authorizedBlocks, blockType)
 		if !authorized {
 			*errs = append(*errs, fmt.Errorf("%s", blockType))

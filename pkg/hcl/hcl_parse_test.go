@@ -132,8 +132,8 @@ func TestInitTerraformFileParsedContent(t *testing.T) {
 func TestGetProviderConfiguration(t *testing.T) {
 	testFile := fs.File{Path: "/tmp/main.tf", Content: []byte(fileContent)}
 	expectedResult := map[string][]string{
-		"google": []string{"project", "version"},
-		"github": []string{"organization"},
+		"google": {"project", "version"},
+		"github": {"organization"},
 	}
 
 	testResult := hcl.GetProviderConfiguration(testFile)
