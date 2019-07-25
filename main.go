@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	version = "1.3.3"
+	version = "1.3.4"
 )
 
 var (
@@ -18,7 +18,12 @@ var (
 
 func main() {
 	exitCode := 0
-	defer func() { os.Exit(exitCode) }()
+	defer func() {
+		if exitCode == 0 {
+			fmt.Println("INFO: terraform-validator ran successfully")
+		}
+		os.Exit(exitCode)
+	}()
 
 	globalConfig := config.GenerateGlobalConfig(version)
 
