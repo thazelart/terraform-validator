@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/utils"
 	"testing"
@@ -63,14 +64,68 @@ func TestContains(t *testing.T) {
 	expectedResult := true
 	testResult := utils.Contains(list, "foo")
 
-	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
 		t.Errorf("Contains(foo) mismatch (-want +got):\n%s", diff)
 	}
 	// test2 false
 	expectedResult = false
 	testResult = utils.Contains(list, "foobar")
 
-	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
 		t.Errorf("Contains(foo) mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestEnsureProgramInstalled(t *testing.T) {
+	// After this test, replace the original fatal function
+	origLogFatalf := utils.LogFatalf
+	defer func() { utils.LogFatalf = origLogFatalf }()
+
+	testResult := []string{}
+	utils.LogFatalf = func(format string, a ...interface{}) {
+		testResult = append(testResult, fmt.Sprintf(format, a[0]))
+	}
+
+	// test1 no error, ls program exists
+	expectedResult := []string{}
+	utils.EnsureProgramInstalled("ls")
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("EnsureProgramInstalled(ls) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 error, dontExist program does not exist
+	expectedResult = append(expectedResult, "FATAL: dontExist is not installed\n")
+	utils.EnsureProgramInstalled("dontExist")
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("EnsureProgramInstalled(ls) mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestRunSystemCommand(t *testing.T) {
+	// After this test, replace the original fatal function
+	origLogFatalf := utils.LogFatalf
+	defer func() { utils.LogFatalf = origLogFatalf }()
+
+	errResult := []string{}
+	utils.LogFatalf = func(format string, a ...interface{}) {
+		errResult = append(errResult, fmt.Sprintf(format, a[0]))
+	}
+
+	// test1 ok: ls -1 utils.go
+	expectedResult := "utils.go\n"
+	testResult, _ := utils.RunSystemCommand("ls", "-1", "utils.go")
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("RunSystemCommand(ls -1 utils.go) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 not ok: ls -1 utils.foo
+	expectedResult = ""
+	testResult, _ = utils.RunSystemCommand("ls", "-1", "utils.foo")
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("RunSystemCommand(ls -1 utils.go) mismatch (-want +got):\n%s", diff)
 	}
 }
