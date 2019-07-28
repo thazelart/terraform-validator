@@ -1,0 +1,3 @@
+module "lol" {
+  source = "github.com/thazelart/arepo"
+
