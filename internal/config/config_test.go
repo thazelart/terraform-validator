@@ -1,11 +1,10 @@
 package config_test
 
 import (
-	"errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"github.com/thazelart/terraform-validator/internal/utils"
+	"github.com/thazelart/terraform-validator/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"os"
 	"sort"
@@ -170,12 +169,11 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 
 	// test3 with unknown filename and no default
 	delete(testGC.TerraformConfig.Files, "default")
-	expectedErrorResult := errors.New("  cannot check authorized blocks, their is no file configuration for foo.tf nor default")
-	_, testErrorResult := testGC.GetAuthorizedBlocks("foo.tf")
+	expectedResult = []string{}
+	testResult, _ = testGC.GetAuthorizedBlocks("foo.tf")
 
-	if expectedErrorResult == nil {
-		t.Errorf("GetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n- %#v\n+ %+v",
-			expectedErrorResult, testErrorResult)
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n%s", diff)
 	}
 }
 

@@ -1,7 +1,7 @@
 package fs
 
 import (
-	"github.com/thazelart/terraform-validator/internal/utils"
+	"github.com/thazelart/terraform-validator/pkg/utils"
 	"io/ioutil"
 	"path"
 	"strings"

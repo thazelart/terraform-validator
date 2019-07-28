@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/docopt/docopt.go"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"github.com/thazelart/terraform-validator/internal/utils"
+	"github.com/thazelart/terraform-validator/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"path"
 	"strconv"
@@ -199,7 +199,7 @@ func (globalConfig GlobalConfig) GetAuthorizedBlocks(filename string) ([]string,
 		return globalConfig.TerraformConfig.Files["default"].AuthorizedBlocks, nil
 	}
 
-	return nil, fmt.Errorf("  cannot check authorized blocks, their is no file configuration for %s nor default", filename)
+	return []string{}, fmt.Errorf("  cannot check authorized blocks, their is no file configuration for %s nor default", filename)
 }
 
 // GetMandatoryFiles get the mandatory file list from the globalConfig
