@@ -4,11 +4,17 @@ package utils
 import (
 	"log"
 	"os"
+	"os/exec"
+	"bytes"
 )
 
 // LogFatal is the log.Fatal go built-in function by default. Permit to change
 // the behaviour of that variable in order to test the EnsureOrFatal function
 var LogFatal = log.Fatal
+
+// LogFatalf is the log.Fatalf go built-in function by default. Permit to change
+// the behaviour of that variable in order to test EnsureProgramInstalled function
+var LogFatalf = log.Fatalf
 
 // EnsureOrFatal ensures the error in nil or uses LogFatal
 func EnsureOrFatal(err error) {
@@ -42,4 +48,28 @@ func Contains(list []string, string string) bool {
 		}
 	}
 	return false
+}
+
+func RunSystemCommand(name string, arg ...string) (string, bool) {
+	cmd := exec.Command(name, arg...)
+    var stdout bytes.Buffer
+    cmd.Stdout = &stdout
+		cmd.Stderr = &stdout
+    err := cmd.Run()
+    if err != nil {
+        LogFatalf("cmd.Run() failed with %s\n", err)
+				return "", false
+    }
+    outStr := string(stdout.Bytes())
+		return outStr, true
+}
+
+// EnsureProgramInstalled check if the given program is installed in the sytem.
+// For example, check if terraform is installed. If not, will crash the program.
+func EnsureProgramInstalled(programName string) bool {
+    _, err := exec.LookPath(programName)
+    if err != nil {
+        LogFatalf("FATAL: %s is not installed\n", programName)
+    }
+		return true
 }
