@@ -66,3 +66,39 @@ func VerifyFile(parsedFile hcl.ParsedFile, pattern string,
 	}
 	return true
 }
+
+// VerifyProvidersVersion ensure that all providers have a version
+func VerifyProvidersVersion(parsedFolder []hcl.ParsedFile) bool {
+	var errs []error
+	for _, parsedFile := range parsedFolder {
+		for _, provider := range parsedFile.Blocks.Providers {
+			if provider.Version == "" {
+				errs = append(errs, fmt.Errorf("%s", provider.Name))
+			}
+		}
+	}
+	if len(errs) > 0 {
+		fmt.Println("\nERROR: Provider's version not set:")
+		for _, err := range errs {
+			fmt.Printf("  - %s\n", err.Error())
+		}
+		return false
+	}
+	return true
+}
+
+// VerifyTerraformVersion ensure that the terraform version is set
+func VerifyTerraformVersion(parsedFolder []hcl.ParsedFile) bool {
+	isTerraformVersionSet := false
+	for _, parsedFile := range parsedFolder {
+		if parsedFile.Blocks.Terraform.Version != "" {
+			isTerraformVersionSet = true
+		}
+	}
+
+	if !isTerraformVersionSet {
+		fmt.Println("\nERROR: Terraform's version not set")
+		return false
+	}
+	return true
+}

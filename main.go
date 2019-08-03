@@ -1,74 +1,59 @@
 package main
 
-// import (
-// 	"fmt"
-// 	"github.com/thazelart/terraform-validator/internal/config"
-// 	"github.com/thazelart/terraform-validator/pkg/utils"
-// 	"github.com/thazelart/terraform-validator/internal/hcl"
-// 	"os"
-// )
 import (
 	"fmt"
-	"github.com/thazelart/terraform-validator/internal/fs"
+	"github.com/thazelart/terraform-validator/internal/checks"
+	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/hcl"
+	"os"
 )
 
 const (
-	version = "1.3.4"
-)
-
-var (
-	isTerraformVersionSet = false
-
-	src = `
-variable "var_with_description" {
-	description = "a var description"
-	type = map(string)
-}
-
-variable "var_without_description" {
-	type        = string
-}
-
-output "out_with_description" {
-	description = "a output description"
-	type = map(string)
-}
-
-output "out_without_description" {
-	type        = string
-}
-
-resource "google_sql_database" "a_resource" {
-	name      = "a_resource"
-	instance  = a_resource
-	charset   = "UTF8"
-	collation = "en_US.UTF8"
-}
-
-
-`
+	version = "2.0.0"
 )
 
 func main() {
-	file := fs.File{Path: "lol.tf", Content: []byte(src)}
-	parsedContent := hcl.GetParsedContent(file)
+	exitCode := 0
+	defer func() {
+		if exitCode == 0 {
+			fmt.Println("INFO: terraform-validator ran successfully")
+		}
+		os.Exit(exitCode)
+	}()
 
-	fmt.Printf("%#v", parsedContent)
+	// Get the configuration
+	globalConfig := config.GenerateGlobalConfig(version)
+
+	// Get the terraform files informations
+	folderParsedContent := hcl.GetFolderParsedContents(globalConfig.WorkDir)
+
+	// Verify files normes and conventions
+	for _, fileParsedContent := range folderParsedContent {
+		ok := checks.VerifyFile(fileParsedContent,
+			globalConfig.TerraformConfig.BlockPatternName,
+			globalConfig.TerraformConfig.Files[fileParsedContent.Name].AuthorizedBlocks)
+
+		if !ok {
+			exitCode = 1
+		}
+	}
+
+	if globalConfig.TerraformConfig.EnsureProvidersVersion {
+		ok := checks.VerifyProvidersVersion(folderParsedContent)
+		if !ok {
+			exitCode = 1
+		}
+	}
+
+	if globalConfig.TerraformConfig.EnsureTerraformVersion {
+		ok := checks.VerifyTerraformVersion(folderParsedContent)
+		if !ok {
+			exitCode = 1
+		}
+	}
 
 }
 
-// func main() {
-// 	exitCode := 0
-// 	defer func() {
-// 		if exitCode == 0 {
-// 			fmt.Println("INFO: terraform-validator ran successfully")
-// 		}
-// 		os.Exit(exitCode)
-// 	}()
-//
-// 	globalConfig := config.GenerateGlobalConfig(version)
-//
 // 	for _, file := range globalConfig.WorkDir.Content {
 // 		var blockNamesErrors []error
 // 		var blocksInFilesErrors []error

@@ -2,11 +2,11 @@ package utils_test
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/kami-zh/go-capturer"
 	"github.com/thazelart/terraform-validator/pkg/utils"
 	"testing"
-	"fmt"
 )
 
 func TestEnsureOrFatal(t *testing.T) {
@@ -125,9 +125,9 @@ func TestRunSystemCommand(t *testing.T) {
 	}
 
 	// test2 not ok: ls -1 utils.foo
-	expectedResult = "out: \nerr: ls: cannot access 'utils.foo': No such file or directory\n"
-	testResult = capturer.CaptureStdout(func() {
-		utils.RunSystemCommand("ls", "-1", "utils.foo")
+	expectedResult = ""
+	capturer.CaptureStdout(func() {
+		testResult, _, _ = utils.RunSystemCommand("ls", "-1", "utils.foo")
 	})
 
 	if diff := cmp.Diff(testResult, expectedResult); diff != "" {

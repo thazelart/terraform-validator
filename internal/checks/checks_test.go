@@ -77,3 +77,83 @@ ERROR: main.tf misformed:
 		t.Errorf("VerifyFile(ko) mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestVerifyProvidersVersion(t *testing.T) {
+	// test1: ok
+	var parsedFolder = []hcl.ParsedFile{
+		hcl.ParsedFile{
+			Name: "one.tf",
+			Blocks: hcl.TerraformBlocks{
+				Providers: []hcl.Provider{
+					hcl.Provider{Name: "google", Version: "=1.28.0"},
+				},
+			},
+		},
+		hcl.ParsedFile{
+			Name: "other.tf",
+			Blocks: hcl.TerraformBlocks{
+				Providers: []hcl.Provider{
+					hcl.Provider{Name: "aws", Version: "=1.2.0"},
+				},
+			},
+		},
+	}
+
+	expectedOut := ""
+	testOut := capturer.CaptureStdout(func() {
+		checks.VerifyProvidersVersion(parsedFolder)
+	})
+	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
+		t.Errorf("VerifyProvidersVersion(ok) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2: aws version not set
+	parsedFolder[1].Blocks.Providers[0].Version = ""
+
+	expectedOut = "\nERROR: Provider's version not set:\n  - aws\n"
+	testOut = capturer.CaptureStdout(func() {
+		checks.VerifyProvidersVersion(parsedFolder)
+	})
+	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
+		t.Errorf("VerifyProvidersVersion(ko) mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestVerifyTerraformVersion(t *testing.T) {
+	// test1: ok
+	var parsedFolder = []hcl.ParsedFile{
+		hcl.ParsedFile{
+			Name: "one.tf",
+			Blocks: hcl.TerraformBlocks{
+				Providers: []hcl.Provider{
+					hcl.Provider{Name: "google", Version: "=1.28.0"},
+				},
+			},
+		},
+		hcl.ParsedFile{
+			Name: "other.tf",
+			Blocks: hcl.TerraformBlocks{
+				Terraform: hcl.Terraform{Version: "> 0.12.0", Backend: "gcs"},
+			},
+		},
+	}
+
+	expectedOut := ""
+	testOut := capturer.CaptureStdout(func() {
+		checks.VerifyTerraformVersion(parsedFolder)
+	})
+	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
+		t.Errorf("VerifyTerraformVersion(ok) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2: aws version not set
+	parsedFolder[1].Blocks.Terraform.Version = ""
+
+	expectedOut = "\nERROR: Terraform's version not set\n"
+	testOut = capturer.CaptureStdout(func() {
+		checks.VerifyTerraformVersion(parsedFolder)
+	})
+	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
+		t.Errorf("VerifyTerraformVersion(ko) mismatch (-want +got):\n%s", diff)
+	}
+}

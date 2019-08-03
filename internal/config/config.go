@@ -86,7 +86,7 @@ type TerraformConfig struct {
 
 // GlobalConfig is the global terraform validator config
 type GlobalConfig struct {
-	WorkDir         fs.Folder
+	WorkDir         string
 	TerraformConfig TerraformConfig
 }
 
@@ -152,8 +152,8 @@ func (c *TerraformConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
 
 // GetTerraformConfig get the terraform-validator config. If terraform-validator.yaml
 // exists it merge the default and the custom config
-func GetTerraformConfig(workDir fs.Folder) TerraformConfig {
-	customConfigFile := path.Join(workDir.Path, ".terraform-validator.yaml")
+func GetTerraformConfig(workDir string) TerraformConfig {
+	customConfigFile := path.Join(workDir, ".terraform-validator.yaml")
 
 	if !utils.FileExists(customConfigFile) {
 		fmt.Println("INFO: using default configuration")
@@ -174,15 +174,14 @@ func GetTerraformConfig(workDir fs.Folder) TerraformConfig {
 func GenerateGlobalConfig(version string) GlobalConfig {
 	// get folder information
 	workDir := ParseArgs(version)
-	workFolder := fs.NewTerraformFolder(workDir)
 
 	// get config
-	conf := GetTerraformConfig(workFolder)
+	conf := GetTerraformConfig(workDir)
 
 	_, ok := conf.Files["default"]
-	utils.OkOrFatal(ok, "FATAL Config.Files must contains at leat \"default\" !")
+	utils.OkOrFatal(ok, "FATAL Config.Files must contains at least \"default\" !")
 
-	return GlobalConfig{WorkDir: workFolder, TerraformConfig: conf}
+	return GlobalConfig{WorkDir: workDir, TerraformConfig: conf}
 }
 
 // GetAuthorizedBlocks gets you the authorized blocks for the given filename.
@@ -216,15 +215,4 @@ func (globalConfig GlobalConfig) GetMandatoryFiles() []string {
 	}
 
 	return mandatoryFiles
-}
-
-// GetFileNameList get the list of filename present in the working directory
-func (globalConfig GlobalConfig) GetFileNameList() []string {
-	var filesList []string
-
-	for _, file := range globalConfig.WorkDir.Content {
-		filesList = append(filesList, file.GetFilename())
-	}
-
-	return filesList
 }
