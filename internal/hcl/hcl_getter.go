@@ -1,8 +1,6 @@
 // Package hcl handle the parsing of your terraform file
 package hcl
 
-import ()
-
 // GetBlockNamesByType return you a map[string][]string defining the blocktypes
 // present in the given parsedfile and the blocknames for each blocktype
 func (parsedfile ParsedFile) GetBlockNamesByType() map[string][]string {

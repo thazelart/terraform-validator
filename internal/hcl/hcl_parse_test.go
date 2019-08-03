@@ -11,15 +11,15 @@ func TestGetFolderParsedContents(t *testing.T) {
 	testPath := "../../examples/default_config"
 
 	expectedResult := []hcl.ParsedFile{
-		hcl.ParsedFile{
+		{
 			Name:   "main.tf",
 			Blocks: hcl.TerraformBlocks{},
 		},
-		hcl.ParsedFile{
+		{
 			Name: "provider.tf",
 			Blocks: hcl.TerraformBlocks{
 				Providers: []hcl.Provider{
-					hcl.Provider{
+					{
 						Name: "google",
 					},
 				},
@@ -58,7 +58,7 @@ func TestGetParsedContent(t *testing.T) {
 	var expectedResult2 hcl.ParsedFile
 	expectedResult2.Name = "test.tf"
 	expectedResult2.Blocks.Variables = []hcl.Variable{
-		hcl.Variable{Name: "var_with_description", Description: "a var description"},
+		{Name: "var_with_description", Description: "a var description"},
 	}
 
 	testResult2 := hcl.GetParsedContent(testFile)

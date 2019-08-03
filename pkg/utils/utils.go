@@ -64,7 +64,7 @@ func RunSystemCommand(name string, arg ...string) (string, string, bool) {
 	return outStr, errStr, true
 }
 
-// EnsureProgramInstalled check if the given program is installed in the sytem.
+// EnsureProgramInstalled check if the given program is installed in the system.
 // For example, check if terraform is installed. If not, will crash the program.
 func EnsureProgramInstalled(programName string) bool {
 	_, err := exec.LookPath(programName)

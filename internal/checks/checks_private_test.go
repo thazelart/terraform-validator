@@ -9,14 +9,14 @@ import (
 
 func TestVerifyBlockNames(t *testing.T) {
 	var testMap = map[string][]string{
-		"data":      []string{"a_data"},
-		"locals":    []string{"a_local", "another_local", "third_local"},
-		"module":    []string{"consul", "network"},
-		"output":    []string{"out_with_description", "out_without_description"},
-		"provider":  []string{"google"},
-		"resource":  []string{"a_resource"},
-		"terraform": []string{},
-		"variable":  []string{"var_with_description", "var_without_description"},
+		"data":      {"a_data"},
+		"locals":    {"a_local", "another_local", "third_local"},
+		"module":    {"consul", "network"},
+		"output":    {"out_with_description", "out_without_description"},
+		"provider":  {"google"},
+		"resource":  {"a_resource"},
+		"terraform": {},
+		"variable":  {"var_with_description", "var_without_description"},
 	}
 
 	var expectedResult []error
@@ -47,9 +47,9 @@ func TestVerifyBlockNames(t *testing.T) {
 
 func TestVerifyAuthorizedBlocktypes(t *testing.T) {
 	var testMap = map[string][]string{
-		"data":   []string{"a_data"},
-		"locals": []string{"a_local", "another_local", "third_local"},
-		"module": []string{"consul", "network"},
+		"data":   {"a_data"},
+		"locals": {"a_local", "another_local", "third_local"},
+		"module": {"consul", "network"},
 	}
 	authorizedBlocks := []string{"data", "locals", "module"}
 

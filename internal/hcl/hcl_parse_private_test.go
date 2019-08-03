@@ -70,30 +70,30 @@ module "network" {
 
 var TestExpectedResult = TerraformBlocks{
 	Variables: []Variable{
-		Variable{Name: "var_with_description", Description: "a var description"},
-		Variable{Name: "var_without_description", Description: ""},
+		{Name: "var_with_description", Description: "a var description"},
+		{Name: "var_without_description", Description: ""},
 	},
 	Outputs: []Output{
-		Output{Name: "out_with_description", Description: "a output description"},
-		Output{Name: "out_without_description", Description: ""},
+		{Name: "out_with_description", Description: "a output description"},
+		{Name: "out_without_description", Description: ""},
 	},
 	Resources: []Resource{
-		Resource{Name: "a_resource", Type: "google_sql_database"},
+		{Name: "a_resource", Type: "google_sql_database"},
 	},
 	Locals: []Locals{
-		Locals{"a_local", "another_local"},
-		Locals{"third_local"},
+		{"a_local", "another_local"},
+		{"third_local"},
 	},
 	Data: []Data{
-		Data{Name: "a_data", Type: "consul_key_prefix"},
+		{Name: "a_data", Type: "consul_key_prefix"},
 	},
 	Providers: []Provider{
-		Provider{Name: "google", Version: "=1.28.0"},
+		{Name: "google", Version: "=1.28.0"},
 	},
 	Terraform: Terraform{Version: "> 0.12.0", Backend: "gcs"},
 	Modules: []Module{
-		Module{Name: "consul", Version: "0.0.5"},
-		Module{Name: "network", Version: "1.2.3"},
+		{Name: "consul", Version: "0.0.5"},
+		{Name: "network", Version: "1.2.3"},
 	},
 }
 

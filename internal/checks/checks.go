@@ -11,7 +11,7 @@ import (
 func verifyBlockNames(blocks map[string][]string, pattern string) (errs []error) {
 	for blockType, blockNames := range blocks {
 		if blockType == "provider" {
-			// provider names are not choosen by the user
+			// provider names are not chosen by the user
 			continue
 		}
 		for _, blockName := range blockNames {

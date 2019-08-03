@@ -12,30 +12,30 @@ var parsedFile = hcl.ParsedFile{
 	Name: "main.tf",
 	Blocks: hcl.TerraformBlocks{
 		Variables: []hcl.Variable{
-			hcl.Variable{Name: "var_with_description", Description: "a var description"},
-			hcl.Variable{Name: "var_without_description", Description: ""},
+			{Name: "var_with_description", Description: "a var description"},
+			{Name: "var_without_description", Description: ""},
 		},
 		Outputs: []hcl.Output{
-			hcl.Output{Name: "out_with_description", Description: "a output description"},
-			hcl.Output{Name: "out_without_description", Description: ""},
+			{Name: "out_with_description", Description: "a output description"},
+			{Name: "out_without_description", Description: ""},
 		},
 		Resources: []hcl.Resource{
-			hcl.Resource{Name: "a_resource", Type: "google_sql_database"},
+			{Name: "a_resource", Type: "google_sql_database"},
 		},
 		Locals: []hcl.Locals{
-			hcl.Locals{"a_local", "another_local"},
-			hcl.Locals{"third_local"},
+			{"a_local", "another_local"},
+			{"third_local"},
 		},
 		Data: []hcl.Data{
-			hcl.Data{Name: "a_data", Type: "consul_key_prefix"},
+			{Name: "a_data", Type: "consul_key_prefix"},
 		},
 		Providers: []hcl.Provider{
-			hcl.Provider{Name: "google", Version: "=1.28.0"},
+			{Name: "google", Version: "=1.28.0"},
 		},
 		Terraform: hcl.Terraform{Version: "> 0.12.0", Backend: "gcs"},
 		Modules: []hcl.Module{
-			hcl.Module{Name: "consul", Version: "0.0.5"},
-			hcl.Module{Name: "network", Version: "1.2.3"},
+			{Name: "consul", Version: "0.0.5"},
+			{Name: "network", Version: "1.2.3"},
 		},
 	},
 }
@@ -56,7 +56,7 @@ func TestVerifyFile(t *testing.T) {
 
 	// test2 with unwanted blocks and misnamed bloc
 	parsedFileTest.Blocks.Data = []hcl.Data{
-		hcl.Data{Name: "a-data", Type: "consul_key_prefix"},
+		{Name: "a-data", Type: "consul_key_prefix"},
 	}
 	authorizedBocks = []string{"module", "locals", "provider", "data",
 		"variable", "output", "terraform"}
@@ -81,19 +81,19 @@ ERROR: main.tf misformed:
 func TestVerifyProvidersVersion(t *testing.T) {
 	// test1: ok
 	var parsedFolder = []hcl.ParsedFile{
-		hcl.ParsedFile{
+		{
 			Name: "one.tf",
 			Blocks: hcl.TerraformBlocks{
 				Providers: []hcl.Provider{
-					hcl.Provider{Name: "google", Version: "=1.28.0"},
+					{Name: "google", Version: "=1.28.0"},
 				},
 			},
 		},
-		hcl.ParsedFile{
+		{
 			Name: "other.tf",
 			Blocks: hcl.TerraformBlocks{
 				Providers: []hcl.Provider{
-					hcl.Provider{Name: "aws", Version: "=1.2.0"},
+					{Name: "aws", Version: "=1.2.0"},
 				},
 			},
 		},
@@ -122,15 +122,15 @@ func TestVerifyProvidersVersion(t *testing.T) {
 func TestVerifyTerraformVersion(t *testing.T) {
 	// test1: ok
 	var parsedFolder = []hcl.ParsedFile{
-		hcl.ParsedFile{
+		{
 			Name: "one.tf",
 			Blocks: hcl.TerraformBlocks{
 				Providers: []hcl.Provider{
-					hcl.Provider{Name: "google", Version: "=1.28.0"},
+					{Name: "google", Version: "=1.28.0"},
 				},
 			},
 		},
-		hcl.ParsedFile{
+		{
 			Name: "other.tf",
 			Blocks: hcl.TerraformBlocks{
 				Terraform: hcl.Terraform{Version: "> 0.12.0", Backend: "gcs"},
