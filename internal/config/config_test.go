@@ -1,11 +1,10 @@
 package config_test
 
 import (
-	"errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/fs"
-	"github.com/thazelart/terraform-validator/internal/utils"
+	"github.com/thazelart/terraform-validator/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"os"
 	"sort"
@@ -70,15 +69,16 @@ func TestUnmarshalYAML(t *testing.T) {
 
 func TestGetTerraformConfig(t *testing.T) {
 	// First test case: no custom config
-	defaultFolder := fs.NewTerraformFolder("../../examples/default_config/")
+	WorkDir := "../../examples/default_config/"
 	expectedDefaultResult := config.DefaultTerraformConfig
-	testDefaultResult := config.GetTerraformConfig(defaultFolder)
+	testDefaultResult := config.GetTerraformConfig(WorkDir)
 
 	if diff := cmp.Diff(expectedDefaultResult, testDefaultResult); diff != "" {
 		t.Errorf("GetCustomConfig(default) mismatch (-want +got):\n%s", diff)
 	}
 
 	// Second test case: with custom config
+	WorkDir = "../../examples/custom_config/"
 	expectedCustomResult := config.DefaultTerraformConfig
 	expectedCustomResult.Files = map[string]config.FileConfig{
 		"default": {
@@ -98,8 +98,7 @@ func TestGetTerraformConfig(t *testing.T) {
 	expectedCustomResult.EnsureProvidersVersion = false
 	expectedCustomResult.EnsureReadmeUpdated = false
 
-	customFolder := fs.NewTerraformFolder("../../examples/custom_config/")
-	testCustomResult := config.GetTerraformConfig(customFolder)
+	testCustomResult := config.GetTerraformConfig(WorkDir)
 
 	if diff := cmp.Diff(expectedCustomResult, testCustomResult); diff != "" {
 		t.Errorf("GetCustomConfig(custom) mismatch (-want +got):\n%s", diff)
@@ -108,11 +107,11 @@ func TestGetTerraformConfig(t *testing.T) {
 
 func TestGenerateGlobalConfig(t *testing.T) {
 	// First test case: no custom config
-	os.Args = []string{"terraform-validator", "../../examples/default_config/"}
+	workDir := "../../examples/default_config/"
+	os.Args = []string{"terraform-validator", workDir}
 
 	defaultConfig := config.DefaultTerraformConfig
-	defaultFolder := fs.NewTerraformFolder("../../examples/default_config/")
-	expectedDefaultConfig := config.GlobalConfig{WorkDir: defaultFolder, TerraformConfig: defaultConfig}
+	expectedDefaultConfig := config.GlobalConfig{WorkDir: workDir, TerraformConfig: defaultConfig}
 	testDefaultResult := config.GenerateGlobalConfig("dev")
 
 	if diff := cmp.Diff(expectedDefaultConfig, testDefaultResult); diff != "" {
@@ -120,7 +119,8 @@ func TestGenerateGlobalConfig(t *testing.T) {
 	}
 
 	// Second test case: with custom config
-	os.Args = []string{"terraform-validator", "../../examples/custom_config/"}
+	workDir = "../../examples/custom_config/"
+	os.Args = []string{"terraform-validator", workDir}
 
 	customConfig := config.DefaultTerraformConfig
 	customConfig.Files = map[string]config.FileConfig{
@@ -139,8 +139,7 @@ func TestGenerateGlobalConfig(t *testing.T) {
 	}
 	customConfig.EnsureProvidersVersion = false
 	customConfig.EnsureReadmeUpdated = false
-	customFolder := fs.NewTerraformFolder("../../examples/custom_config/")
-	expectedCustomConfig := config.GlobalConfig{WorkDir: customFolder, TerraformConfig: customConfig}
+	expectedCustomConfig := config.GlobalConfig{WorkDir: workDir, TerraformConfig: customConfig}
 	testCustomResult := config.GenerateGlobalConfig("dev")
 
 	if diff := cmp.Diff(expectedCustomConfig, testCustomResult); diff != "" {
@@ -170,12 +169,11 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 
 	// test3 with unknown filename and no default
 	delete(testGC.TerraformConfig.Files, "default")
-	expectedErrorResult := errors.New("  cannot check authorized blocks, their is no file configuration for foo.tf nor default")
-	_, testErrorResult := testGC.GetAuthorizedBlocks("foo.tf")
+	expectedResult = []string{}
+	testResult, _ = testGC.GetAuthorizedBlocks("foo.tf")
 
-	if expectedErrorResult == nil {
-		t.Errorf("GetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n- %#v\n+ %+v",
-			expectedErrorResult, testErrorResult)
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -191,28 +189,6 @@ func TestGetMandatoryFiles(t *testing.T) {
 	expectedResult := []string{"backend.tf", "main.tf", "outputs.tf", "providers.tf", "variables.tf"}
 
 	testResult := testGC.GetMandatoryFiles()
-	sort.Strings(testResult)
-
-	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("GetMandatoryFiles() mismatch (-want +got):\n%s", diff)
-	}
-}
-
-func TestGetFileNameList(t *testing.T) {
-	var testGC config.GlobalConfig
-
-	foo := fs.File{Path: "/path/to/foo.tf", Content: []byte{}}
-	bar := fs.File{Path: "/path/to/bar.tf", Content: []byte{}}
-
-	var fileList []fs.File
-	fileList = append(fileList, foo)
-	fileList = append(fileList, bar)
-
-	testGC.WorkDir = fs.Folder{Path: "/path/to", Content: fileList}
-
-	expectedResult := []string{"bar.tf", "foo.tf"}
-
-	testResult := testGC.GetFileNameList()
 	sort.Strings(testResult)
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {

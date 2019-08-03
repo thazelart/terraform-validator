@@ -3,7 +3,6 @@ package config_test
 import (
 	"fmt"
 	"github.com/thazelart/terraform-validator/internal/config"
-	"github.com/thazelart/terraform-validator/internal/fs"
 )
 
 func ExampleParseArgs() {
@@ -15,10 +14,9 @@ func ExampleParseArgs() {
 func ExampleGetTerraformConfig() {
 	// get folder information
 	workDir := config.ParseArgs("dev")
-	workFolder := fs.NewTerraformFolder(workDir)
 
 	// get config
-	terraformConf := config.GetTerraformConfig(workFolder)
+	terraformConf := config.GetTerraformConfig(workDir)
 
 	fmt.Printf("The terraform config': %+v", terraformConf)
 }
