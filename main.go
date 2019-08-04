@@ -8,10 +8,15 @@ import (
 	"os"
 )
 
-const (
-	version = "2.0.0"
+var (
+	version string
 )
 
+func init() {
+	if version == "" {
+		version = "dev"
+	}
+}
 func main() {
 	exitCode := 0
 	defer func() {
