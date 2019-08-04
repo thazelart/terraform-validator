@@ -1,7 +1,6 @@
 language: go
 sudo: false
 go:
-  - 1.11.x
   - 1.12.x
 
 before_install:
@@ -12,6 +11,7 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - rm -f coverage.txt
 
 deploy:
   - provider: script

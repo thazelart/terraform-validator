@@ -23,8 +23,8 @@ changelog:
     - '^docs:'
     - '^test:'
     - '^chore:'
-    - Merge pull request
-    - Merge branch
+    - '^Merge pull request'
+    - '^Merge branch'
 archives:
 - 
   name_template: '{{ .Binary }}_{{ .Os }}_{{ .Arch }}'
