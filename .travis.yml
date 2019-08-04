@@ -1,6 +1,7 @@
 language: go
 sudo: false
 go:
+  - 1.11.x
   - 1.12.x
 
 before_install:
@@ -11,3 +12,12 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    script: curl -sL https://git.io/goreleaser | bash
+    on:
+      tags: true
+      condition: $TRAVIS_OS_NAME = linux
