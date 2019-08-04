@@ -11,12 +11,9 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - rm -f coverage.txt
-
 
 before_deploy:
   - rm -f coverage.txt
-  - sed -i "s/version = \"dev\"/version = \"${TRAVIS_BRANCH}\"/" main.go
 
 deploy:
   - provider: script
