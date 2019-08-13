@@ -2,10 +2,11 @@ package fs_test
 
 import (
 	"fmt"
+
 	"github.com/thazelart/terraform-validator/internal/fs"
 )
 
-func ExampleFileEqual() {
+func ExampleFile_FileEqual() {
 	file1 := fs.NewFile("my_file.txt")
 	file2 := fs.NewFile("another_one.txt")
 
