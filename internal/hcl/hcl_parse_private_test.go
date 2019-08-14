@@ -197,6 +197,7 @@ func TestGetModulesInfomation(t *testing.T) {
 }
 
 func TestGetTerraformInfomation(t *testing.T) {
+	// test1 version + backend
 	testFile := fs.File{Path: "test.tf", Content: []byte(TestFileContent)}
 	parsedContent := hclParse(testFile)
 
@@ -204,5 +205,41 @@ func TestGetTerraformInfomation(t *testing.T) {
 
 	if diff := cmp.Diff(testResult, TestExpectedResult.Terraform); diff != "" {
 		t.Errorf("getTerraformInfomation() mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 only Backend
+	content := `terraform {
+		backend "gcs" {}
+	}`
+	testFile = fs.File{Path: "test.tf", Content: []byte(content)}
+
+	parsedContent = hclParse(testFile)
+
+	expectedResult := Terraform{
+		Version: "",
+		Backend: "gcs",
+	}
+	testResult = parsedContent.getTerraformInfomation()
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("getTerraformInfomation(backend) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test3 only version
+	content = `terraform {
+		required_version = "> 0.12.0"
+	}`
+	testFile = fs.File{Path: "test.tf", Content: []byte(content)}
+
+	parsedContent = hclParse(testFile)
+
+	expectedResult = Terraform{
+		Version: "> 0.12.0",
+		Backend: "",
+	}
+	testResult = parsedContent.getTerraformInfomation()
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("getTerraformInfomation(version) mismatch (-want +got):\n%s", diff)
 	}
 }
