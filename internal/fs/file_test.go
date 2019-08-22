@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewFile(t *testing.T) {
-	filePath := "../../examples/default_config/main.tf"
+	filePath := "../../testdata/ok_default_config/main.tf"
 	fileContent := []byte("/* here would be a part of your terraform code */\n")
 
 	expectedResult := fs.File{Path: filePath, Content: fileContent}

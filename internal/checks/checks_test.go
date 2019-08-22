@@ -157,3 +157,41 @@ func TestVerifyTerraformVersion(t *testing.T) {
 		t.Errorf("VerifyTerraformVersion(ko) mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestVerifyMandatoryFilesPresent(t *testing.T) {
+	var parsedFolder = []hcl.ParsedFile{
+		{
+			Name: "one.tf",
+			Blocks: hcl.TerraformBlocks{
+				Providers: []hcl.Provider{
+					{Name: "google", Version: "=1.28.0"},
+				},
+			},
+		},
+	}
+
+	// test1 all mandatory files are present
+	mandatoryFiles := []string{"one.tf"}
+	expectedOut := ""
+
+	testOut := capturer.CaptureStdout(func() {
+		checks.VerifyMandatoryFilesPresent(parsedFolder, mandatoryFiles)
+	})
+	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
+		t.Errorf("VerifyMandatoryFilesPresent(ok) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 one missing file
+	mandatoryFiles = []string{"one.tf", "two.tf"}
+	expectedOut = `
+ERROR: missing mandatory file(s):
+  - two.tf
+`
+
+	testOut = capturer.CaptureStdout(func() {
+		checks.VerifyMandatoryFilesPresent(parsedFolder, mandatoryFiles)
+	})
+	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
+		t.Errorf("VerifyMandatoryFilesPresent(ko) mismatch (-want +got):\n%s", diff)
+	}
+}

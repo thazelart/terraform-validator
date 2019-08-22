@@ -7,9 +7,15 @@ import (
 )
 
 func TestListTerraformFiles(t *testing.T) {
-	testPath := "../../examples/default_config"
+	testPath := "../../testdata/ok_default_config"
 
-	expectedFileFlist := []string{"../../examples/default_config/main.tf", "../../examples/default_config/provider.tf"}
+	expectedFileFlist := []string{
+		"../../testdata/ok_default_config/backend.tf",
+		"../../testdata/ok_default_config/main.tf",
+		"../../testdata/ok_default_config/outputs.tf",
+		"../../testdata/ok_default_config/providers.tf",
+		"../../testdata/ok_default_config/variables.tf",
+	}
 	resultFileList := fs.ListTerraformFiles(testPath)
 	if diff := cmp.Diff(expectedFileFlist, resultFileList); diff != "" {
 		t.Errorf("ListTerraformFiles() mismatch (-want +got):\n%s", diff)
@@ -17,10 +23,10 @@ func TestListTerraformFiles(t *testing.T) {
 }
 
 func TestNewTerraformFolder(t *testing.T) {
-	testPath := "../../examples/default_config"
+	testPath := "../../testdata/ok_custom_config"
 	// Create the expected resultFileList
-	mainFile := fs.NewFile("../../examples/default_config/main.tf")
-	providerFile := fs.NewFile("../../examples/default_config/provider.tf")
+	mainFile := fs.NewFile("../../testdata/ok_custom_config/main.tf")
+	providerFile := fs.NewFile("../../testdata/ok_custom_config/provider.tf")
 	expectedResult := fs.Folder{Path: testPath, Content: []fs.File{mainFile, providerFile}}
 
 	testResult := fs.NewTerraformFolder(testPath)
