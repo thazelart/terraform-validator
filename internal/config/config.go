@@ -178,9 +178,6 @@ func GenerateGlobalConfig(version string) GlobalConfig {
 	// get config
 	conf := GetTerraformConfig(workDir)
 
-	_, ok := conf.Files["default"]
-	utils.OkOrFatal(ok, "FATAL Config.Files must contains at least \"default\" !")
-
 	return GlobalConfig{WorkDir: workDir, TerraformConfig: conf}
 }
 

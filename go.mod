@@ -8,9 +8,10 @@ require (
 	github.com/docopt/docopt.go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/go-test/deep v1.0.2 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
-	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/google/go-cmp v0.3.0
 	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/hashicorp/hcl2 v0.0.0-20190725010614-0c3fe388e450
+	github.com/kami-zh/go-capturer v0.0.0-20171211120116-e492ea43421d
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect

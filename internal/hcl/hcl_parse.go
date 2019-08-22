@@ -185,8 +185,7 @@ func (hclroot hclRoot) getModulesInfomation() []Module {
 
 func (hclroot hclRoot) getTerraformInfomation() Terraform {
 	terraformConfig := hclroot.Terraform
-	version := ""
-	backend := ""
+	var version, backend string
 
 	if terraformConfig == nil {
 		return *new(Terraform)

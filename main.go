@@ -35,13 +35,8 @@ func main() {
 
 	// Verify files normes and conventions
 	for _, fileParsedContent := range folderParsedContent {
-		var authorizedBlocks []string
-		fileConfig, fileConfigExists := globalConfig.TerraformConfig.Files[fileParsedContent.Name]
-		if fileConfigExists {
-			authorizedBlocks = fileConfig.AuthorizedBlocks
-		} else {
-			authorizedBlocks = globalConfig.TerraformConfig.Files["default"].AuthorizedBlocks
-		}
+		authorizedBlocks, _ := globalConfig.GetAuthorizedBlocks(fileParsedContent.Name)
+
 		ok := checks.VerifyFile(fileParsedContent,
 			globalConfig.TerraformConfig.BlockPatternName,
 			authorizedBlocks)
