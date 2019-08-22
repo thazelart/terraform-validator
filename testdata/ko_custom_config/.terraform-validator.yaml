@@ -5,9 +5,8 @@ files:
       - output
       - provider
       - terraform
-      - resource
       - module
       - data
       - locals
-ensure_providers_version: false
-ensure_readme_updated: false
+ensure_terraform_version: false
+block_pattern_name: "^[a-z0-9-]*$"

@@ -8,22 +8,39 @@ import (
 )
 
 func TestGetFolderParsedContents(t *testing.T) {
-	testPath := "../../examples/default_config"
+	testPath := "../../testdata/ok_default_config"
 
 	expectedResult := []hcl.ParsedFile{
+		{
+			Name: "backend.tf",
+			Blocks: hcl.TerraformBlocks{
+				Terraform: hcl.Terraform{
+					Version: ">=0.12",
+				},
+			},
+		},
 		{
 			Name:   "main.tf",
 			Blocks: hcl.TerraformBlocks{},
 		},
 		{
-			Name: "provider.tf",
+			Name:   "outputs.tf",
+			Blocks: hcl.TerraformBlocks{},
+		},
+		{
+			Name: "providers.tf",
 			Blocks: hcl.TerraformBlocks{
 				Providers: []hcl.Provider{
 					{
-						Name: "google",
+						Name:    "google",
+						Version: "foo",
 					},
 				},
 			},
+		},
+		{
+			Name:   "variables.tf",
+			Blocks: hcl.TerraformBlocks{},
 		},
 	}
 	testResult := hcl.GetFolderParsedContents(testPath)

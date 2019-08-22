@@ -5,6 +5,7 @@ import (
 	"github.com/thazelart/terraform-validator/internal/hcl"
 	"github.com/thazelart/terraform-validator/pkg/utils"
 	"regexp"
+	"sort"
 )
 
 // VerifyBlockNames ensure that all the terraform blocks are well named
@@ -120,6 +121,8 @@ func VerifyMandatoryFilesPresent(parsedFolder []hcl.ParsedFile,
 			missingFiles = append(missingFiles, mandatoryFile)
 		}
 	}
+
+	sort.Strings(missingFiles)
 
 	// Print errors
 	if len(missingFiles) > 0 {

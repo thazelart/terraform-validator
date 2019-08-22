@@ -41,15 +41,16 @@ func TestUnmarshalYAML(t *testing.T) {
 		},
 	}
 	expectedCustomResult.EnsureProvidersVersion = false
+	expectedCustomResult.EnsureTerraformVersion = false
 	expectedCustomResult.EnsureReadmeUpdated = false
 
-	customConfigFile := fs.NewFile("../../examples/custom_config/.terraform-validator.yaml")
+	customConfigFile := fs.NewFile("../../testdata/ok_custom_config/.terraform-validator.yaml")
 	var testCustomResult config.TerraformConfig
 	err := yaml.Unmarshal(customConfigFile.Content, &testCustomResult)
 	utils.EnsureOrFatal(err)
 
 	if diff := cmp.Diff(expectedCustomResult, testCustomResult); diff != "" {
-		t.Errorf("GetCustomConfig(custom) mismatch (-want +got):\n%s", diff)
+		t.Errorf("TestUnmarshalYAML(custom) mismatch (-want +got):\n%s", diff)
 	}
 
 	// second test with the others possibility of custmization
@@ -63,13 +64,13 @@ func TestUnmarshalYAML(t *testing.T) {
 	utils.EnsureOrFatal(err)
 
 	if diff := cmp.Diff(expectedCustomResult2, testCustomResult2); diff != "" {
-		t.Errorf("GetCustomConfig(custom) mismatch (-want +got):\n%s", diff)
+		t.Errorf("TestUnmarshalYAML(custom) mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestGetTerraformConfig(t *testing.T) {
 	// First test case: no custom config
-	WorkDir := "../../examples/default_config/"
+	WorkDir := "../../testdata/ok_default_config/"
 	expectedDefaultResult := config.DefaultTerraformConfig
 	testDefaultResult := config.GetTerraformConfig(WorkDir)
 
@@ -78,7 +79,7 @@ func TestGetTerraformConfig(t *testing.T) {
 	}
 
 	// Second test case: with custom config
-	WorkDir = "../../examples/custom_config/"
+	WorkDir = "../../testdata/ok_custom_config/"
 	expectedCustomResult := config.DefaultTerraformConfig
 	expectedCustomResult.Files = map[string]config.FileConfig{
 		"default": {
@@ -96,6 +97,7 @@ func TestGetTerraformConfig(t *testing.T) {
 		},
 	}
 	expectedCustomResult.EnsureProvidersVersion = false
+	expectedCustomResult.EnsureTerraformVersion = false
 	expectedCustomResult.EnsureReadmeUpdated = false
 
 	testCustomResult := config.GetTerraformConfig(WorkDir)
@@ -107,7 +109,7 @@ func TestGetTerraformConfig(t *testing.T) {
 
 func TestGenerateGlobalConfig(t *testing.T) {
 	// First test case: no custom config
-	workDir := "../../examples/default_config/"
+	workDir := "../../testdata/ok_default_config/"
 	os.Args = []string{"terraform-validator", workDir}
 
 	defaultConfig := config.DefaultTerraformConfig
@@ -119,7 +121,7 @@ func TestGenerateGlobalConfig(t *testing.T) {
 	}
 
 	// Second test case: with custom config
-	workDir = "../../examples/custom_config/"
+	workDir = "../../testdata/ok_custom_config/"
 	os.Args = []string{"terraform-validator", workDir}
 
 	customConfig := config.DefaultTerraformConfig
@@ -138,6 +140,7 @@ func TestGenerateGlobalConfig(t *testing.T) {
 		},
 	}
 	customConfig.EnsureProvidersVersion = false
+	customConfig.EnsureTerraformVersion = false
 	customConfig.EnsureReadmeUpdated = false
 	expectedCustomConfig := config.GlobalConfig{WorkDir: workDir, TerraformConfig: customConfig}
 	testCustomResult := config.GenerateGlobalConfig("dev")
