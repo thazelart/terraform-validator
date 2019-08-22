@@ -46,6 +46,14 @@ func main() {
 		}
 	}
 
+	// Ensure mandatory files are present
+	mandatoryFiles := globalConfig.GetMandatoryFiles()
+	ok := checks.VerifyMandatoryFilesPresent(folderParsedContent, mandatoryFiles)
+	if !ok {
+		exitCode = 1
+	}
+
+	// Ensure Providers version is set
 	if globalConfig.TerraformConfig.EnsureProvidersVersion {
 		ok := checks.VerifyProvidersVersion(folderParsedContent)
 		if !ok {
@@ -53,6 +61,7 @@ func main() {
 		}
 	}
 
+	// Ensure Terraform version is set
 	if globalConfig.TerraformConfig.EnsureTerraformVersion {
 		ok := checks.VerifyTerraformVersion(folderParsedContent)
 		if !ok {

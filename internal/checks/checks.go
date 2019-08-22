@@ -102,3 +102,33 @@ func VerifyTerraformVersion(parsedFolder []hcl.ParsedFile) bool {
 	}
 	return true
 }
+
+// VerifyMandatoryFilesPresent ensure that the mandatory files are present
+func VerifyMandatoryFilesPresent(parsedFolder []hcl.ParsedFile,
+	mandatoryFiles []string) bool {
+
+	var files, missingFiles []string
+
+	// Get terraform file list
+	for _, parsedFile := range parsedFolder {
+		files = append(files, parsedFile.Name)
+	}
+
+	// Ensure mandatory ones are present
+	for _, mandatoryFile := range mandatoryFiles {
+		if !utils.Contains(files, mandatoryFile) {
+			missingFiles = append(missingFiles, mandatoryFile)
+		}
+	}
+
+	// Print errors
+	if len(missingFiles) > 0 {
+		fmt.Println("\nERROR: missing mandatory file(s):")
+		for _, missingFile := range missingFiles {
+			fmt.Printf("  - %s\n", missingFile)
+		}
+		return false
+	}
+
+	return true
+}
