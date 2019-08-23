@@ -19,19 +19,19 @@ type tc struct {
 var (
 	update    = flag.Bool("update", false, "update .golden.json files")
 	testCases = []tc{
-		tc{
+		{
 			Path:   "../../testdata/ko_custom_config",
 			Golden: "../../testdata/ko_custom_config.golden",
 		},
-		tc{
+		{
 			Path:   "../../testdata/ko_default_config",
 			Golden: "../../testdata/ko_default_config.golden",
 		},
-		tc{
+		{
 			Path:   "../../testdata/ok_custom_config",
 			Golden: "../../testdata/ok_custom_config.golden",
 		},
-		tc{
+		{
 			Path:   "../../testdata/ok_default_config",
 			Golden: "../../testdata/ok_default_config.golden",
 		},

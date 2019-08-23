@@ -1,0 +1,2 @@
+ensure_providers_version: false
+block_pattern_name: 'foo'
