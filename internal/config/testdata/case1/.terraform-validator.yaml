@@ -1,14 +1,20 @@
-files:
-  default:
-    authorized_blocks:
-      - variable
-      - output
-      - provider
-      - terraform
-      - resource
-      - module
-      - data
-      - locals
-ensure_providers_version: false
-ensure_terraform_version: false
-ensure_readme_updated: false
+
+---
+current_folder_class: "cust1"
+classes:
+  cust1:
+    Files:
+      default:
+        authorized_blocks:
+          - variable
+          - output
+          - provider
+          - terraform
+          - resource
+          - module
+          - data
+          - locals
+    ensure_providers_version: false
+    ensure_terraform_version: false
+  cust2:
+    block_pattern_name: ^[a-z0-9]*$"

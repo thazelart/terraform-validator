@@ -1,3 +1,4 @@
+INFO: using default configuration in testdata/ko_default_config
 
 ERROR: providers.tf misformed:
   Unmatching "^[a-z0-9_]*$" pattern blockname(s):
@@ -9,8 +10,3 @@ ERROR: missing mandatory file(s):
   - backend.tf
   - outputs.tf
   - variables.tf
-
-ERROR: Provider's version not set:
-  - google
-
-ERROR: Terraform's version not set

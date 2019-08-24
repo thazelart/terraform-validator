@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/thazelart/terraform-validator/internal/config"
-	"github.com/thazelart/terraform-validator/internal/tfv"
+	"github.com/thazelart/terraform-validator/internal/checks"
 	"os"
 )
 
@@ -26,10 +26,9 @@ func main() {
 		os.Exit(exitCode)
 	}()
 
-	// Get the configuration
-	globalConfig := config.GenerateGlobalConfig(version)
+	rootDir := config.ParseArgs(version)
 
-	ok := tfv.MainChecks(globalConfig)
+	ok := checks.MainChecks(config.DefaultTfvConfig(), rootDir)
 	if !ok {
 		exitCode = 1
 	}

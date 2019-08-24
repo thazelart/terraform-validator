@@ -1,31 +1,33 @@
 ---
-Files:
-  main.tf:
-    mandatory: true
-    authorized_blocks:
-  variables.tf:
-    mandatory: true
-    authorized_blocks:
-      - variable
-  outputs.tf:
-    mandatory: true
-    authorized_blocks:
-      - output
-  provider.tf:
-    mandatory: true
-    authorized_blocks:
-      - provider
-  backend.tf:
-    mandatory: true
-    authorized_blocks:
-      - terraform
-  default:
-    mandatory: false
-    authorized_blocks:
-      - resource
-      - module
-      - data
-      - locals
+current_folder_class: "tfv_default"
+classes:
+  tfv_default:
+    main.tf:
+      mandatory: true
+      authorized_blocks:
+    variables.tf:
+      mandatory: true
+      authorized_blocks:
+        - variable
+    outputs.tf:
+      mandatory: true
+      authorized_blocks:
+        - output
+    provider.tf:
+      mandatory: true
+      authorized_blocks:
+        - provider
+    backend.tf:
+      mandatory: true
+      authorized_blocks:
+        - terraform
+    default:
+      mandatory: false
+      authorized_blocks:
+        - resource
+        - module
+        - data
+        - locals
 ensure_terraform_version: true
 ensure_providers_version: true
 ensure_readme_updated: true

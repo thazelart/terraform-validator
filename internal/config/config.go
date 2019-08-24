@@ -7,7 +7,6 @@ import (
 	"github.com/thazelart/terraform-validator/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"path"
-	"strconv"
 )
 
 // usage is the terraform-validator help
@@ -27,40 +26,6 @@ const usage = `
     -v, --version     show version and exit
 `
 
-// DefaultTerraformConfig is the default TerraformConfig configuration
-var DefaultTerraformConfig = TerraformConfig{
-	Files: map[string]FileConfig{
-		"main.tf": {
-			Mandatory:        true,
-			AuthorizedBlocks: nil,
-		},
-		"variables.tf": {
-			Mandatory:        true,
-			AuthorizedBlocks: []string{"variable"},
-		},
-		"outputs.tf": {
-			Mandatory:        true,
-			AuthorizedBlocks: []string{"output"},
-		},
-		"providers.tf": {
-			Mandatory:        true,
-			AuthorizedBlocks: []string{"provider"},
-		},
-		"backend.tf": {
-			Mandatory:        true,
-			AuthorizedBlocks: []string{"terraform"},
-		},
-		"default": {
-			Mandatory:        false,
-			AuthorizedBlocks: []string{"resource", "module", "data", "locals"},
-		},
-	},
-	EnsureTerraformVersion: true,
-	EnsureProvidersVersion: true,
-	EnsureReadmeUpdated:    true,
-	BlockPatternName:       "^[a-z0-9_]*$",
-}
-
 // FileConfig is the configuration for a .tf file
 // AuthorizedBlocks is the list of authorized blocks in that file (for example
 // "variables", "output"...).
@@ -70,24 +35,65 @@ type FileConfig struct {
 	Mandatory        bool     `yaml:"mandatory"`
 }
 
-// TerraformConfig is the full configuration of terraform validator
-// Files is the map of .tf files defines with the FileConfig type.
-// EnsureTerraformVersion define if the terraform version has to be set or not.
-// EnsureProvidersVersion define if the providers versions has to be set or not.
-// EnsureReadmeUpdated define if we care or not if the documentation has been updated.
-// BlockPatternName is the pattern that must match all the terraform blocks name.
-type TerraformConfig struct {
-	Files                  map[string]FileConfig
-	EnsureTerraformVersion bool
-	EnsureProvidersVersion bool
-	EnsureReadmeUpdated    bool
-	BlockPatternName       string
+// FolderConfigClass is a type that define a class of config for a folder.
+type FolderConfigClass struct {
+	Files                  map[string]FileConfig `yaml:"files"`
+	EnsureTerraformVersion bool                  `yaml:"ensure_terraform_version"`
+	EnsureProvidersVersion bool                  `yaml:"ensure_providers_version"`
+	BlockPatternName       string                `yaml:"block_pattern_name"`
 }
 
-// GlobalConfig is the global terraform validator config
-type GlobalConfig struct {
-	WorkDir         string
-	TerraformConfig TerraformConfig
+// TfvConfig is the full configuration of terraform validator
+// CurrentFolderClass is the current folder applied class
+// Classes is a map of FolderConfigClass
+type TfvConfig struct {
+	CurrentFolderClass string
+	Classes            map[string]FolderConfigClass
+}
+
+// DefaultFolderConfigClass return you the default FolderConfigClass
+func DefaultFolderConfigClass() FolderConfigClass {
+	return FolderConfigClass{
+		Files: map[string]FileConfig{
+			"main.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: nil,
+			},
+			"variables.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"variable"},
+			},
+			"outputs.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"output"},
+			},
+			"providers.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"provider"},
+			},
+			"backend.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"terraform"},
+			},
+			"default": {
+				Mandatory:        false,
+				AuthorizedBlocks: []string{"resource", "module", "data", "locals"},
+			},
+		},
+		EnsureTerraformVersion: false,
+		EnsureProvidersVersion: false,
+		BlockPatternName:       "^[a-z0-9_]*$",
+	}
+}
+
+// DefaultTfvConfig returns you the default TfvConfig
+func DefaultTfvConfig() TfvConfig {
+	return TfvConfig{
+		CurrentFolderClass: "default",
+		Classes: map[string]FolderConfigClass{
+			"default": DefaultFolderConfigClass(),
+		},
+	}
 }
 
 // ParseArgs get the path given as os argument
@@ -99,110 +105,89 @@ func ParseArgs(version string) string {
 }
 
 // UnmarshalYAML is a custom yaml unmarshaller for TerraformConfig
-func (c *TerraformConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (c *TfvConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var customO struct {
-		Files                  map[string]FileConfig `yaml:"files"`
-		EnsureTerraformVersion string                `yaml:"ensure_terraform_version"`
-		EnsureProvidersVersion string                `yaml:"ensure_providers_version"`
-		EnsureReadmeUpdated    string                `yaml:"ensure_readme_updated"`
-		BlockPatternName       string                `yaml:"block_pattern_name"`
+		CurrentFolderClass string                       `yaml:"current_folder_class"`
+		Classes            map[string]FolderConfigClass `yaml:"classes"`
 	}
-	if err := unmarshal(&customO); err != nil {
-		return err
+	err := unmarshal(&customO)
+	utils.EnsureOrFatal(err)
+
+	if customO.CurrentFolderClass != "" {
+		c.CurrentFolderClass = customO.CurrentFolderClass
+	} else {
+		c.CurrentFolderClass = "default"
 	}
 
-	if len(customO.Files) != 0 {
-		c.Files = customO.Files
-	} else {
-		c.Files = DefaultTerraformConfig.Files
+	if c.Classes == nil {
+		c.Classes = make(map[string]FolderConfigClass)
+		c.Classes["default"] = DefaultFolderConfigClass()
 	}
+	for key, class := range customO.Classes {
+		if len(class.Files) == 0 {
+			class.Files = DefaultFolderConfigClass().Files
+		}
 
-	if customO.EnsureTerraformVersion != "" {
-		typedEnsureTerraformVersion, err := strconv.ParseBool(customO.EnsureTerraformVersion)
-		utils.EnsureOrFatal(err)
-		c.EnsureTerraformVersion = typedEnsureTerraformVersion
-	} else {
-		c.EnsureTerraformVersion = DefaultTerraformConfig.EnsureTerraformVersion
-	}
+		if class.BlockPatternName == "" {
+			class.BlockPatternName = DefaultFolderConfigClass().BlockPatternName
+		}
 
-	if customO.EnsureProvidersVersion != "" {
-		typedEnsureProvidersVersion, err := strconv.ParseBool(customO.EnsureProvidersVersion)
-		utils.EnsureOrFatal(err)
-		c.EnsureProvidersVersion = typedEnsureProvidersVersion
-	} else {
-		c.EnsureProvidersVersion = DefaultTerraformConfig.EnsureProvidersVersion
-	}
-
-	if customO.EnsureReadmeUpdated != "" {
-		typedEnsureReadmeUpdated, err := strconv.ParseBool(customO.EnsureReadmeUpdated)
-		utils.EnsureOrFatal(err)
-		c.EnsureReadmeUpdated = typedEnsureReadmeUpdated
-	} else {
-		c.EnsureReadmeUpdated = DefaultTerraformConfig.EnsureReadmeUpdated
-	}
-
-	if customO.BlockPatternName != "" {
-		c.BlockPatternName = customO.BlockPatternName
-	} else {
-		c.BlockPatternName = DefaultTerraformConfig.BlockPatternName
+		c.Classes[key] = class
 	}
 
 	return nil
 }
 
-// GetTerraformConfig get the terraform-validator config. If terraform-validator.yaml
+// GetTerraformConfig get the terraform-validator config. If .terraform-validator.yaml
 // exists it merge the default and the custom config
-func GetTerraformConfig(workDir string) TerraformConfig {
+func (c TfvConfig) GetTerraformConfig(workDir string) TfvConfig {
 	customConfigFile := path.Join(workDir, ".terraform-validator.yaml")
 
-	if !utils.FileExists(customConfigFile) {
-		fmt.Println("INFO: using default configuration")
-		return DefaultTerraformConfig
+	if utils.FileExists(customConfigFile) {
+		tempFile := fs.NewFile(customConfigFile)
+		err := yaml.Unmarshal(tempFile.Content, &c)
+		utils.EnsureOrFatal(err)
 	}
-	fmt.Println("INFO: using custom configuration")
-	tempFile := fs.NewFile(customConfigFile)
 
-	var customConfig TerraformConfig
-	err := yaml.Unmarshal(tempFile.Content, &customConfig)
-	utils.EnsureOrFatal(err)
-
-	return customConfig
+	fmt.Printf("INFO: using %s configuration in %s\n", c.CurrentFolderClass, workDir)
+	return c
 }
 
-// GenerateGlobalConfig generates the terraform-validator global config.
-// It takes the WorkDir needed informations and the TerraformConfig (default or custom)
-func GenerateGlobalConfig(version string) GlobalConfig {
-	// get folder information
-	workDir := ParseArgs(version)
+// GetFolderConfigClass get the applied FolderConfigClass
+func (c TfvConfig) GetFolderConfigClass() FolderConfigClass {
+	folderConfigClass, ok := c.Classes[c.CurrentFolderClass]
 
-	// get config
-	conf := GetTerraformConfig(workDir)
+	utils.OkOrFatal(ok,
+		fmt.Sprintf("FATAL: terraform-validation configuration does not contain %s class",
+			c.CurrentFolderClass,
+		),
+	)
 
-	return GlobalConfig{WorkDir: workDir, TerraformConfig: conf}
+	return folderConfigClass
 }
 
 // GetAuthorizedBlocks gets you the authorized blocks for the given filename.
 // If the filename is not configure it gets you the dfault configuration.
 // If their is no default either, return you an error.
-func (globalConfig GlobalConfig) GetAuthorizedBlocks(filename string) ([]string, error) {
-	_, ok := globalConfig.TerraformConfig.Files[filename]
+func (folderConfigClass FolderConfigClass) GetAuthorizedBlocks(filename string) ([]string, error) {
+	file, ok := folderConfigClass.Files[filename]
 	if ok {
-		return globalConfig.TerraformConfig.Files[filename].AuthorizedBlocks, nil
+		return file.AuthorizedBlocks, nil
 	}
 
-	_, ok = globalConfig.TerraformConfig.Files["default"]
+	file, ok = folderConfigClass.Files["default"]
 	if ok {
-		return globalConfig.TerraformConfig.Files["default"].AuthorizedBlocks, nil
+		return file.AuthorizedBlocks, nil
 	}
 
 	return []string{}, fmt.Errorf("  cannot check authorized blocks, their is no file configuration for %s nor default", filename)
 }
 
 // GetMandatoryFiles get the mandatory file list from the globalConfig
-func (globalConfig GlobalConfig) GetMandatoryFiles() []string {
+func (folderConfigClass FolderConfigClass) GetMandatoryFiles() []string {
 	var mandatoryFiles []string
 
-	for filename, fileInfos := range globalConfig.TerraformConfig.Files {
+	for filename, fileInfos := range folderConfigClass.Files {
 		if filename == "default" {
 			continue
 		}

@@ -1,11 +1,11 @@
-package tfv_test
+package checks_test
 
 import (
 	"flag"
 	"github.com/google/go-cmp/cmp"
 	"github.com/kami-zh/go-capturer"
 	"github.com/thazelart/terraform-validator/internal/config"
-	"github.com/thazelart/terraform-validator/internal/tfv"
+	"github.com/thazelart/terraform-validator/internal/checks"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -20,20 +20,20 @@ var (
 	update    = flag.Bool("update", false, "update .golden.json files")
 	testCases = []tc{
 		{
-			Path:   "../../testdata/ko_custom_config",
-			Golden: "../../testdata/ko_custom_config.golden",
+			Path:   "testdata/ko_custom_config",
+			Golden: "testdata/ko_custom_config.golden",
 		},
 		{
-			Path:   "../../testdata/ko_default_config",
-			Golden: "../../testdata/ko_default_config.golden",
+			Path:   "testdata/ko_default_config",
+			Golden: "testdata/ko_default_config.golden",
 		},
 		{
-			Path:   "../../testdata/ok_custom_config",
-			Golden: "../../testdata/ok_custom_config.golden",
+			Path:   "testdata/ok_custom_config",
+			Golden: "testdata/ok_custom_config.golden",
 		},
 		{
-			Path:   "../../testdata/ok_default_config",
-			Golden: "../../testdata/ok_default_config.golden",
+			Path:   "testdata/ok_default_config",
+			Golden: "testdata/ok_default_config.golden",
 		},
 	}
 )
@@ -41,10 +41,10 @@ var (
 func TestMaintChecks(t *testing.T) {
 	for _, testCase := range testCases {
 		os.Args = []string{"terraform-validator", testCase.Path}
-		globalConfig := config.GenerateGlobalConfig("dev")
+		rootDir := config.ParseArgs("dev")
 
 		response := capturer.CaptureStdout(func() {
-			tfv.MainChecks(globalConfig)
+			checks.MainChecks(config.DefaultTfvConfig(), rootDir)
 		})
 
 		goldenFile := testCase.Golden
