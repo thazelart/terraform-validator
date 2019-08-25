@@ -64,14 +64,10 @@ func hclParse(f fs.File) hclRoot {
 
 	parser := hclparse.NewParser()
 	file, diags := parser.ParseHCL(f.Content, f.Path)
-	if len(diags) != 0 {
-		utils.LogFatal(diags)
-	}
+	utils.NoDiagsOrFatal(diags)
 
 	diags = gohcl.DecodeBody(file.Body, nil, &result)
-	if len(diags) != 0 {
-		utils.LogFatal(diags)
-	}
+	utils.NoDiagsOrFatal(diags)
 
 	return result
 }

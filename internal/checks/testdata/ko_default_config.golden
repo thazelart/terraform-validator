@@ -1,0 +1,12 @@
+INFO: running on testdata/ko_default_config with default configuration
+ERROR: providers.tf misformed:
+  Unmatching "^[a-z0-9_]*$" pattern blockname(s):
+    - foo-bar (resource)
+  Unauthorized block(s):
+    - resource
+
+ERROR: missing mandatory file(s):
+  - backend.tf
+  - outputs.tf
+  - variables.tf
+

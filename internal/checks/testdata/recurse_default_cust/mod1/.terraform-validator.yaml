@@ -1,0 +1,16 @@
+current_folder_class: "cust1"
+classes:
+  cust1:
+    files:
+      default:
+        authorized_blocks:
+          - variable
+          - output
+          - provider
+          - terraform
+          - module
+          - data
+          - locals
+    ensure_providers_version: true
+    ensure_terraform_version: true
+    block_pattern_name: "^[a-z0-9-]*$"

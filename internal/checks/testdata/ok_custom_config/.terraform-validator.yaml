@@ -1,0 +1,15 @@
+current_folder_class: "cust1"
+classes:
+  cust1:
+    files:
+      default:
+        authorized_blocks:
+          - variable
+          - output
+          - provider
+          - terraform
+          - resource
+          - module
+          - data
+          - locals
+    

@@ -61,12 +61,12 @@ func TestVerifyFile(t *testing.T) {
 	authorizedBocks = []string{"module", "locals", "provider", "data",
 		"variable", "output", "terraform"}
 
-	expectedOut = `
-ERROR: main.tf misformed:
+	expectedOut = `ERROR: main.tf misformed:
   Unmatching "^[a-z0-9_]*$" pattern blockname(s):
     - a-data (data)
   Unauthorized block(s):
     - resource
+
 `
 
 	testOut = capturer.CaptureStdout(func() {
@@ -110,7 +110,7 @@ func TestVerifyProvidersVersion(t *testing.T) {
 	// test2: aws version not set
 	parsedFolder[1].Blocks.Providers[0].Version = ""
 
-	expectedOut = "\nERROR: Provider's version not set:\n  - aws\n"
+	expectedOut = "ERROR: Provider's version not set:\n  - aws\n\n"
 	testOut = capturer.CaptureStdout(func() {
 		checks.VerifyProvidersVersion(parsedFolder)
 	})
@@ -149,7 +149,7 @@ func TestVerifyTerraformVersion(t *testing.T) {
 	// test2: aws version not set
 	parsedFolder[1].Blocks.Terraform.Version = ""
 
-	expectedOut = "\nERROR: Terraform's version not set\n"
+	expectedOut = "ERROR: Terraform's version not set\n\n"
 	testOut = capturer.CaptureStdout(func() {
 		checks.VerifyTerraformVersion(parsedFolder)
 	})
@@ -183,9 +183,9 @@ func TestVerifyMandatoryFilesPresent(t *testing.T) {
 
 	// test2 one missing file
 	mandatoryFiles = []string{"one.tf", "two.tf"}
-	expectedOut = `
-ERROR: missing mandatory file(s):
+	expectedOut = `ERROR: missing mandatory file(s):
   - two.tf
+
 `
 
 	testOut = capturer.CaptureStdout(func() {

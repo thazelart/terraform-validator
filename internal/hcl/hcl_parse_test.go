@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetFolderParsedContents(t *testing.T) {
-	testPath := "../../testdata/ok_default_config"
+	testPath := "../checks/testdata/ok_default_config"
 
 	expectedResult := []hcl.ParsedFile{
 		{

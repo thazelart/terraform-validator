@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewFile(t *testing.T) {
-	filePath := "../../testdata/ok_default_config/main.tf"
+	filePath := "testdata/main.tf"
 	fileContent := []byte("/* here would be a part of your terraform code */\n")
 
 	expectedResult := fs.File{Path: filePath, Content: fileContent}
@@ -32,8 +32,8 @@ func TestGetFilename(t *testing.T) {
 }
 
 func TestFileEqual(t *testing.T) {
-	file1 := fs.NewFile("file_test.go")
-	file2 := fs.NewFile("file_example_test.go")
+	file1 := fs.NewFile("testdata/main.tf")
+	file2 := fs.NewFile("testdata/outputs.tf")
 
 	result1 := file1.FileEqual(file1)
 	result2 := file1.FileEqual(file2)
