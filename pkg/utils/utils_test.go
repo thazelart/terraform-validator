@@ -4,10 +4,44 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/go-cmp/cmp"
+	"github.com/hashicorp/hcl2/hcl"
 	"github.com/kami-zh/go-capturer"
 	"github.com/thazelart/terraform-validator/pkg/utils"
 	"testing"
 )
+
+func TestNoDiagsOrFatal(t *testing.T) {
+	// After this test, replace the original fatal function
+	origLogFatal := utils.LogFatal
+	defer func() { utils.LogFatal = origLogFatal }()
+
+	testResult := []string{}
+	utils.LogFatal = func(args ...interface{}) {
+		testResult = append(testResult, "failed")
+	}
+
+	// case1 no diags
+	var diags hcl.Diagnostics
+
+	utils.NoDiagsOrFatal(diags)
+
+	if len(testResult) != 0 {
+		t.Errorf("Got: %d diags, wanted: 0", len(testResult))
+	}
+
+	// case2 with diag
+	diags = append(diags, &hcl.Diagnostic{
+		Severity: hcl.DiagError,
+		Summary:  "error",
+		Detail:   "what a shame",
+	})
+
+	utils.NoDiagsOrFatal(diags)
+
+	if len(testResult) != 1 {
+		t.Errorf("Got: %d diags, wanted: 1", len(testResult))
+	}
+}
 
 func TestEnsureOrFatal(t *testing.T) {
 	// After this test, replace the original fatal function

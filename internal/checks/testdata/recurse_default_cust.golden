@@ -1,0 +1,24 @@
+INFO: running on testdata/recurse_default_cust with default configuration
+ERROR: providers.tf misformed:
+  Unmatching "^[a-z0-9_]*$" pattern blockname(s):
+    - foo-bar (resource)
+  Unauthorized block(s):
+    - resource
+
+ERROR: missing mandatory file(s):
+  - backend.tf
+  - outputs.tf
+  - variables.tf
+
+INFO: running on testdata/recurse_default_cust/mod1 with cust1 configuration
+ERROR: main.tf misformed:
+  Unmatching "^[a-z0-9-]*$" pattern blockname(s):
+    - foo_bar (resource)
+  Unauthorized block(s):
+    - resource
+
+ERROR: Provider's version not set:
+  - google
+
+ERROR: Terraform's version not set
+

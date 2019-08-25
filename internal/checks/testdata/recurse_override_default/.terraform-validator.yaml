@@ -1,0 +1,16 @@
+classes:
+  default:
+    files:
+      default:
+        authorized_blocks:
+          - variable
+          - output
+          - provider
+          - terraform
+          - resource
+          - module
+          - data
+          - locals
+    ensure_providers_version: true
+    ensure_terraform_version: true
+    block_pattern_name: "^[a-z0-9-]*$"

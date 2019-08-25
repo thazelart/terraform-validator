@@ -22,141 +22,171 @@ func TestParseArgs(t *testing.T) {
 	}
 }
 
-func TestUnmarshalYAML(t *testing.T) {
-	// first test: using custom config from example
-	expectedCustomResult := config.DefaultTerraformConfig
-	expectedCustomResult.Files = map[string]config.FileConfig{
-		"default": {
-			Mandatory: false,
-			AuthorizedBlocks: []string{
-				"variable",
-				"output",
-				"provider",
-				"terraform",
-				"resource",
-				"module",
-				"data",
-				"locals",
-			},
+func TestDefaultTfvConfig(t *testing.T) {
+	expectedResult := config.TfvConfig{
+		CurrentFolderClass: "default",
+		Classes: map[string]config.FolderConfigClass{
+			"default": config.DefaultFolderConfigClass(),
 		},
 	}
-	expectedCustomResult.EnsureProvidersVersion = false
-	expectedCustomResult.EnsureTerraformVersion = false
-	expectedCustomResult.EnsureReadmeUpdated = false
 
-	customConfigFile := fs.NewFile("../../testdata/ok_custom_config/.terraform-validator.yaml")
-	var testCustomResult config.TerraformConfig
+	testResult := config.DefaultTfvConfig()
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestDefaultFolderConfigClass(t *testing.T) {
+	expectedResult := config.FolderConfigClass{
+		Files: map[string]config.FileConfig{
+			"main.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: nil,
+			},
+			"variables.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"variable"},
+			},
+			"outputs.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"output"},
+			},
+			"providers.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"provider"},
+			},
+			"backend.tf": {
+				Mandatory:        true,
+				AuthorizedBlocks: []string{"terraform"},
+			},
+			"default": {
+				Mandatory:        false,
+				AuthorizedBlocks: []string{"resource", "module", "data", "locals"},
+			},
+		},
+		EnsureTerraformVersion: false,
+		EnsureProvidersVersion: false,
+		BlockPatternName:       "^[a-z0-9_]*$",
+	}
+
+	testResult := config.DefaultFolderConfigClass()
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("DefaultFolderConfigClass() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestUnmarshalYAML(t *testing.T) {
+	// case1 test: using custom config from example
+	expectedCustomResult := config.DefaultTfvConfig()
+	expectedCustomResult.CurrentFolderClass = "cust1"
+	expectedCustomResult.Classes["cust1"] = config.FolderConfigClass{
+		Files: map[string]config.FileConfig{
+			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
+			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
+			"main.tf":      {Mandatory: true},
+			"outputs.tf":   {AuthorizedBlocks: []string{"output"}, Mandatory: true},
+			"providers.tf": {AuthorizedBlocks: []string{"provider"}, Mandatory: true},
+			"variables.tf": {AuthorizedBlocks: []string{"variable"}, Mandatory: true},
+		},
+		BlockPatternName: "^[a-z0-9_]*$",
+	}
+	expectedCustomResult.Classes["cust2"] = config.FolderConfigClass{
+		Files: map[string]config.FileConfig{
+			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
+			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
+			"main.tf":      {Mandatory: true},
+			"outputs.tf":   {AuthorizedBlocks: []string{"output"}, Mandatory: true},
+			"providers.tf": {AuthorizedBlocks: []string{"provider"}, Mandatory: true},
+			"variables.tf": {AuthorizedBlocks: []string{"variable"}, Mandatory: true},
+		},
+		BlockPatternName: `^[a-z0-9]*$"`,
+	}
+
+	customConfigFile := fs.NewFile("testdata/case1/.terraform-validator.yaml")
+	testCustomResult := config.DefaultTfvConfig()
 	err := yaml.Unmarshal(customConfigFile.Content, &testCustomResult)
 	utils.EnsureOrFatal(err)
 
-	if diff := cmp.Diff(expectedCustomResult, testCustomResult); diff != "" {
+	if diff := cmp.Diff(testCustomResult, expectedCustomResult); diff != "" {
 		t.Errorf("TestUnmarshalYAML(custom) mismatch (-want +got):\n%s", diff)
 	}
 
-	// second test with the others possibility of custmization
-	expectedCustomResult2 := config.DefaultTerraformConfig
-	expectedCustomResult2.EnsureTerraformVersion = false
-	expectedCustomResult2.BlockPatternName = "foo"
-
-	customConfigContent := []byte("ensure_terraform_version: false\nblock_pattern_name: 'foo'")
-	var testCustomResult2 config.TerraformConfig
-	err = yaml.Unmarshal(customConfigContent, &testCustomResult2)
+	// case2 same test with empty TfvConfig
+	customConfigFile = fs.NewFile("testdata/case2/.terraform-validator.yaml")
+	expectedCustomResult.CurrentFolderClass = "default"
+	var testCustomResult2 config.TfvConfig
+	err = yaml.Unmarshal(customConfigFile.Content, &testCustomResult2)
 	utils.EnsureOrFatal(err)
 
-	if diff := cmp.Diff(expectedCustomResult2, testCustomResult2); diff != "" {
+	if diff := cmp.Diff(testCustomResult2, expectedCustomResult); diff != "" {
 		t.Errorf("TestUnmarshalYAML(custom) mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestGetTerraformConfig(t *testing.T) {
-	// First test case: no custom config
-	WorkDir := "../../testdata/ok_default_config/"
-	expectedDefaultResult := config.DefaultTerraformConfig
-	testDefaultResult := config.GetTerraformConfig(WorkDir)
-
-	if diff := cmp.Diff(expectedDefaultResult, testDefaultResult); diff != "" {
-		t.Errorf("GetCustomConfig(default) mismatch (-want +got):\n%s", diff)
-	}
-
-	// Second test case: with custom config
-	WorkDir = "../../testdata/ok_custom_config/"
-	expectedCustomResult := config.DefaultTerraformConfig
-	expectedCustomResult.Files = map[string]config.FileConfig{
-		"default": {
-			Mandatory: false,
-			AuthorizedBlocks: []string{
-				"variable",
-				"output",
-				"provider",
-				"terraform",
-				"resource",
-				"module",
-				"data",
-				"locals",
-			},
+	// case1 test case: with custom config
+	WorkDir := "testdata/case1"
+	expectedResult := config.DefaultTfvConfig()
+	expectedResult.CurrentFolderClass = "cust1"
+	expectedResult.Classes["cust1"] = config.FolderConfigClass{
+		Files: map[string]config.FileConfig{
+			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
+			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
+			"main.tf":      {Mandatory: true},
+			"outputs.tf":   {AuthorizedBlocks: []string{"output"}, Mandatory: true},
+			"providers.tf": {AuthorizedBlocks: []string{"provider"}, Mandatory: true},
+			"variables.tf": {AuthorizedBlocks: []string{"variable"}, Mandatory: true},
 		},
+		BlockPatternName: "^[a-z0-9_]*$",
 	}
-	expectedCustomResult.EnsureProvidersVersion = false
-	expectedCustomResult.EnsureTerraformVersion = false
-	expectedCustomResult.EnsureReadmeUpdated = false
+	expectedResult.Classes["cust2"] = config.FolderConfigClass{
+		Files: map[string]config.FileConfig{
+			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
+			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
+			"main.tf":      {Mandatory: true},
+			"outputs.tf":   {AuthorizedBlocks: []string{"output"}, Mandatory: true},
+			"providers.tf": {AuthorizedBlocks: []string{"provider"}, Mandatory: true},
+			"variables.tf": {AuthorizedBlocks: []string{"variable"}, Mandatory: true},
+		},
+		BlockPatternName: `^[a-z0-9]*$"`,
+	}
 
-	testCustomResult := config.GetTerraformConfig(WorkDir)
+	testResult := config.DefaultTfvConfig().GetTerraformConfig(WorkDir)
 
-	if diff := cmp.Diff(expectedCustomResult, testCustomResult); diff != "" {
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
 		t.Errorf("GetCustomConfig(custom) mismatch (-want +got):\n%s", diff)
+	}
+
+	// case2 test case: no custom config
+	WorkDir = "testdata/case3"
+	expectedResult = config.DefaultTfvConfig()
+	testResult = config.DefaultTfvConfig().GetTerraformConfig(WorkDir)
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetCustomConfig(default) mismatch (-want +got):\n%s", diff)
 	}
 }
 
-func TestGenerateGlobalConfig(t *testing.T) {
-	// First test case: no custom config
-	workDir := "../../testdata/ok_default_config/"
-	os.Args = []string{"terraform-validator", workDir}
+func TestGetFolderConfigClass(t *testing.T) {
+	testData := config.DefaultTfvConfig()
+	expectedResult := config.DefaultFolderConfigClass()
 
-	defaultConfig := config.DefaultTerraformConfig
-	expectedDefaultConfig := config.GlobalConfig{WorkDir: workDir, TerraformConfig: defaultConfig}
-	testDefaultResult := config.GenerateGlobalConfig("dev")
+	testResult := testData.GetFolderConfigClass()
 
-	if diff := cmp.Diff(expectedDefaultConfig, testDefaultResult); diff != "" {
-		t.Errorf("GetCustomConfig(default) mismatch (-want +got):\n%s", diff)
-	}
-
-	// Second test case: with custom config
-	workDir = "../../testdata/ok_custom_config/"
-	os.Args = []string{"terraform-validator", workDir}
-
-	customConfig := config.DefaultTerraformConfig
-	customConfig.Files = map[string]config.FileConfig{
-		"default": {
-			AuthorizedBlocks: []string{
-				"variable",
-				"output",
-				"provider",
-				"terraform",
-				"resource",
-				"module",
-				"data",
-				"locals",
-			},
-		},
-	}
-	customConfig.EnsureProvidersVersion = false
-	customConfig.EnsureTerraformVersion = false
-	customConfig.EnsureReadmeUpdated = false
-	expectedCustomConfig := config.GlobalConfig{WorkDir: workDir, TerraformConfig: customConfig}
-	testCustomResult := config.GenerateGlobalConfig("dev")
-
-	if diff := cmp.Diff(expectedCustomConfig, testCustomResult); diff != "" {
-		t.Errorf("GetCustomConfig(custom) mismatch (-want +got):\n%s", diff)
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetFolderConfigClass() mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestGetAuthorizedBlocks(t *testing.T) {
-	var testGC config.GlobalConfig
-	testGC.TerraformConfig = config.DefaultTerraformConfig
+	testGC := config.DefaultTfvConfig()
+	config := testGC.Classes[testGC.CurrentFolderClass]
 
 	// test1 with known filename
 	expectedResult := []string{"variable"}
-	testResult, _ := testGC.GetAuthorizedBlocks("variables.tf")
+	testResult, _ := config.GetAuthorizedBlocks("variables.tf")
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
 		t.Errorf("GetAuthorizedBlocks(knownFile) mismatch (-want +got):\n%s", diff)
@@ -164,16 +194,16 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 
 	// test2 with unknown filename
 	expectedResult = []string{"resource", "module", "data", "locals"}
-	testResult, _ = testGC.GetAuthorizedBlocks("foo.tf")
+	testResult, _ = config.GetAuthorizedBlocks("foo.tf")
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
 		t.Errorf("GetAuthorizedBlocks(unknownFile) mismatch (-want +got):\n%s", diff)
 	}
 
 	// test3 with unknown filename and no default
-	delete(testGC.TerraformConfig.Files, "default")
+	delete(config.Files, "default")
 	expectedResult = []string{}
-	testResult, _ = testGC.GetAuthorizedBlocks("foo.tf")
+	testResult, _ = config.GetAuthorizedBlocks("foo.tf")
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
 		t.Errorf("GetAuthorizedBlocks(unknownFileNoDefault) mismatch (-want +got):\n%s", diff)
@@ -181,17 +211,17 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 }
 
 func TestGetMandatoryFiles(t *testing.T) {
-	var testGC config.GlobalConfig
-	testGC.TerraformConfig = config.DefaultTerraformConfig
+	testGC := config.DefaultTfvConfig()
+	conf := testGC.Classes[testGC.CurrentFolderClass]
 
 	// set default as mandatory, it must not be in expectedResult
-	tmpDefault := testGC.TerraformConfig.Files["default"]
+	tmpDefault := conf.Files["default"]
 	tmpDefault.Mandatory = true
-	testGC.TerraformConfig.Files["default"] = tmpDefault
+	conf.Files["default"] = tmpDefault
 
 	expectedResult := []string{"backend.tf", "main.tf", "outputs.tf", "providers.tf", "variables.tf"}
 
-	testResult := testGC.GetMandatoryFiles()
+	testResult := conf.GetMandatoryFiles()
 	sort.Strings(testResult)
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {

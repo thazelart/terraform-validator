@@ -41,3 +41,19 @@ func NewTerraformFolder(pathF string) Folder {
 
 	return Folder{Path: pathF, Content: fileList}
 }
+
+// GetSubFolderList returns you the list of folders inside pathF
+func GetSubFolderList(pathF string) []string {
+	var folders []string
+
+	filesInfo, err := ioutil.ReadDir(pathF)
+	utils.EnsureOrFatal(err)
+
+	for _, f := range filesInfo {
+		if f.IsDir() {
+			folders = append(folders, path.Join(pathF, f.Name()))
+		}
+	}
+
+	return folders
+}

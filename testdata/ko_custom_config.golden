@@ -1,9 +1,0 @@
-
-ERROR: main.tf misformed:
-  Unmatching "^[a-z0-9-]*$" pattern blockname(s):
-    - foo_bar (resource)
-  Unauthorized block(s):
-    - resource
-
-ERROR: Provider's version not set:
-  - google

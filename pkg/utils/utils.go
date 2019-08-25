@@ -4,6 +4,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"github.com/hashicorp/hcl2/hcl"
 	"log"
 	"os"
 	"os/exec"
@@ -16,6 +17,13 @@ var LogFatal = log.Fatal
 // LogFatalf is the log.Fatalf go built-in function by default. Permit to change
 // the behaviour of that variable in order to test EnsureProgramInstalled function
 var LogFatalf = log.Fatalf
+
+// NoDiagsOrFatal ensure that the diag slice is empty or uses LogFatal
+func NoDiagsOrFatal(diags hcl.Diagnostics) {
+	if len(diags) != 0 {
+		LogFatal(diags)
+	}
+}
 
 // EnsureOrFatal ensures the error in nil or uses LogFatal
 func EnsureOrFatal(err error) {

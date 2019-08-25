@@ -4,7 +4,10 @@
 [![Build Status](https://travis-ci.com/thazelart/terraform-validator.svg?branch=master)](https://travis-ci.com/thazelart/terraform-validator) [![CodeCov](https://codecov.io/gh/thazelart/terraform-validator/branch/master/graph/badge.svg)](https://codecov.io/gh/thazelart/terraform-validator) [![Go Report Card](https://goreportcard.com/badge/github.com/thazelart/terraform-validator)](https://goreportcard.com/report/github.com/thazelart/terraform-validator)      
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/thazelart/terraform-validator.svg)](https://hub.docker.com/r/thazelart/terraform-validator) [![Docker Pulls](https://img.shields.io/docker/pulls/thazelart/terraform-validator)](https://hub.docker.com/r/thazelart/terraform-validator)                 
 
-Terraform is a Go library that help you ensure that a terraform folder answer to your norms and conventions rules.             
+Terraform is a Go library that help you ensure that a terraform folder answer to your norms and conventions rules. This can be really useful in several cases :
+* You're a team that want to have a clean and maintainable code
+* You're a lonely developer that develop a lot of modules and you want to have a certain consistency between them               
+
 **Features:**         
  * [x] ensure that the terraform blocknames follow the given pattern
  * [x] ensure that blocks are in a wanted files (for example output blocks must be in `outputs.tf`)
@@ -13,6 +16,7 @@ Terraform is a Go library that help you ensure that a terraform folder answer to
  * [x] ensure that the providers version has been set
 
 **Next features:**                    
+ * [ ] layered terraform folders (test recursively)
  * [ ] ensure Readme was updated (if you are using [terraform-docs](https://github.com/segmentio/terraform-docs))
  * [ ] ensure `terraform fmt` is ok
 
@@ -57,75 +61,15 @@ Validate a terraform folder located in `./examples`:
 terraform-validator ./examples
 ```
 
-## Configuration
-The [default](/internal/config/default_config.yaml) configuration is:
-```yaml
----
-files:
-  main.tf:
-    mandatory: true
-    authorized_blocks:
-  variables.tf:
-    mandatory: true
-    authorized_blocks:
-      - variable
-  outputs.tf:
-    mandatory: true
-    authorized_blocks:
-      - output
-  providers.tf:
-    mandatory: true
-    authorized_blocks:
-      - provider
-  backend.tf:
-    mandatory: true
-    authorized_blocks:
-      - terraform
-  default:
-    mandatory: false
-    authorized_blocks:
-      - resource
-      - module
-      - data
-      - locals
-ensure_terraform_version: true
-ensure_providers_version: true
-ensure_readme_updated: true
-block_pattern_name: "^[a-z0-9_]*$"
-```
+## Configuration       
+Even if a default configuration is provided by terraform validator, you can customize it in a `.terraform-validator.yaml` file.
 
-You can set you own configuration by adding a `.terraform-validator.yaml` file at the root of your terraform folder.
-For example :
-```yaml
----
-files:
-  # you don't have any rule about files, every file can have every block type
-  default:
-    authorized_blocks:
-      - variable
-      - output
-      - provider
-      - terraform
-      - resource
-      - module
-      - data
-      - locals
-# you don't want to check the terraform version
-ensure_terraform_version: false
-# you prefere kebab case for terraform blocknames
-block_pattern_name: "^[a-z0-9-]*$"
-```
-The non present parameters in your `.terraform-validator.yaml` will take the default value.
+[Full configuration documentation here](docs/Configuration.md)
 
 ## CI/CD integration
 You can run directly terraform-validator inside you build pipeline thanks to the [terraform-validator docker image](https://hub.docker.com/r/thazelart/terraform-validator) !
-This docker file run automatically terraform in the root directory. If you want to run it in your build pipeline, you can configure if very easily.                  
 
-For example, in cloud build :
-```yaml
-steps:
-- name: 'thazelart/terraform-validator'
-```
+[Full CI/CD documentation here](docs/CICD.md)
 
 ## Authors
 [Thibault Hazelart](https://github.com/thazelart)
