@@ -146,3 +146,20 @@ If a sub-directory define another `cust1`, it will replace this configuration fo
 
 ### `current_folder_class`
 The default `current_folder_class` is by default the one choosen in the parent directory.
+
+### tips
+During on journey through your stacks and terraform modules, terraform-validator won't run test in folders that do not contain any `.tf` files BUT will read the configurations.                    
+That way, you can easily configure a large number of folders at once. Let's take this example:
+```
+|-- modules
+|   |-- .terraform-validator.yaml
+|   `-- mod1
+|       |-- README.md
+|       |-- main.tf
+|       `-- provider.tf
+|   `-- mod2
+|       |-- README.md
+|       |-- main.tf
+|       `-- provider.tf
+```
+The `.terraform-validator.yaml` file inside the `modules` folder define the configuration for both `mod1` and `mod2` !

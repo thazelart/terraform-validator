@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/thazelart/terraform-validator/internal/config"
 	"github.com/thazelart/terraform-validator/internal/checks"
+	"github.com/thazelart/terraform-validator/internal/config"
 	"os"
 )
 
