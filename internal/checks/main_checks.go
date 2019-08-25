@@ -1,10 +1,10 @@
 package checks
 
 import (
-	"github.com/thazelart/terraform-validator/internal/config"
-	"github.com/thazelart/terraform-validator/internal/hcl"
-	"github.com/thazelart/terraform-validator/internal/fs"
 	"fmt"
+	"github.com/thazelart/terraform-validator/internal/config"
+	"github.com/thazelart/terraform-validator/internal/fs"
+	"github.com/thazelart/terraform-validator/internal/hcl"
 )
 
 // MainChecks in the main function that will check an entire folder
