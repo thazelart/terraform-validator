@@ -1,7 +1,7 @@
 
 ---
-current_folder_class: "cust1"
-classes:
+current_layer: "cust1"
+layers:
   cust1:
     Files:
       default:

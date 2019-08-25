@@ -4,13 +4,13 @@
 terraform-validator provides some customizations via the `.terraform-validator.yaml` file.
 The defaults fit for most projects.
 
-your configuration file can contains two parameters: `classes` and `current_folder_class`.
+your configuration file can contains two parameters: `layers` and `current_layer`.
 
 
-## `classes`
-Classes is a map of class. By default, classes contains one class named `default` :
+## layers
+Layers is a map of layer. By default, layers contains one layer named `default` :
 ```
-classes:
+layers:
   default:
     files:
       main.tf:
@@ -43,8 +43,8 @@ classes:
     ensure_providers_version: false
     block_pattern_name: "^[a-z0-9_]*$"
 ```
-### What is a class ?
-A class is a set of parameter that define the complete configuration of terraform-validator.
+### What is a layer ?
+A layer is a set of parameter that define the complete configuration of terraform-validator.
 
 #### files
 files is a map of filename that contains what rules define each files.
@@ -105,25 +105,25 @@ Configure terraform-validator in order to ensure (or not) if the providers versi
 Configure the pattern that should match each terraform resources.
 
 
-## `current_folder_class`
+## current_layer
 *Type: `string`*
 *Default: `default`*                       
-The `current_folder_class` permit you to select the configuration class you want to use in the current folder.
+The `current_layer` permit you to select the configuration layer you want to use in the current folder.
 
 ```
 # .terraform-validator.yaml
-current_folder_class: my_config
+current_layer: my_config
 ```
 
 
 ## Recursivity and configuration
-### `classes`
-Each time you define a new class in your `.terraform-validator.yaml`, this is added to terraform-validator configuration for the current directory and its sub-directories.
+### layers
+Each time you define a new layer in your `.terraform-validator.yaml`, this is added to terraform-validator configuration for the current directory and its sub-directories.
 
 for example, here is my root directory configuration file:
 ```
 # .terraform-validator.yaml
-classes:
+layers:
   cust1:
     files:
       default:
@@ -140,12 +140,12 @@ classes:
     block_pattern_name: "^[a-z0-9-]*$"
 ```
 
-Starting from the root directory and for all its sub-directories, `cust1` class will be available.
+Starting from the root directory and for all its sub-directories, `cust1` layer will be available.
 
 If a sub-directory define another `cust1`, it will replace this configuration for this sub-directory and its own sub-directories.
 
-### `current_folder_class`
-The default `current_folder_class` is by default the one choosen in the parent directory.
+### current_layer
+The default `current_layer` is by default the one choosen in the parent directory.
 
 ### tips
 During on journey through your stacks and terraform modules, terraform-validator won't run test in folders that do not contain any `.tf` files BUT will read the configurations.                    
