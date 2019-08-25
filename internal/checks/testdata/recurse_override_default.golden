@@ -1,0 +1,12 @@
+INFO: running on testdata/recurse_override_default with default configuration
+ERROR: Provider's version not set:
+  - non_version_google
+
+ERROR: Terraform's version not set
+
+INFO: running on testdata/recurse_override_default/mod1 with default configuration
+ERROR: Provider's version not set:
+  - google
+
+ERROR: Terraform's version not set
+

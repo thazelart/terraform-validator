@@ -32,3 +32,13 @@ func TestNewTerraformFolder(t *testing.T) {
 		t.Errorf("NewTerraformFolder() mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestGetSubFolderList(t *testing.T) {
+	expectedResult := []string{"testdata/modules"}
+
+	testResult := fs.GetSubFolderList("testdata")
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("GetSubFolderList() mismatch (-want +got):\n%s", diff)
+	}
+}

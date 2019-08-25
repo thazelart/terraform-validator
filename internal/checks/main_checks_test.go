@@ -35,6 +35,30 @@ var (
 			Path:   "testdata/ok_default_config",
 			Golden: "testdata/ok_default_config.golden",
 		},
+		{
+			Path:   "testdata/recurse_cust_default",
+			Golden: "testdata/recurse_cust_default.golden",
+		},
+		{
+			Path:   "testdata/recurse_cust_empty_nothing",
+			Golden: "testdata/recurse_cust_empty_nothing.golden",
+		},
+		{
+			Path:   "testdata/recurse_cust_nothing",
+			Golden: "testdata/recurse_cust_nothing.golden",
+		},
+		{
+			Path:   "testdata/recurse_default_cust",
+			Golden: "testdata/recurse_default_cust.golden",
+		},
+		{
+			Path:   "testdata/recurse_default_emptywithconf_cust",
+			Golden: "testdata/recurse_default_emptywithconf_cust.golden",
+		},
+		{
+			Path:   "testdata/recurse_override_default",
+			Golden: "testdata/recurse_override_default.golden",
+		},
 	}
 )
 

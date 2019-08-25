@@ -1,5 +1,4 @@
-INFO: using cust1 configuration in testdata/ko_custom_config
-
+INFO: running on testdata/ko_custom_config with cust1 configuration
 ERROR: main.tf misformed:
   Unmatching "^[a-z0-9-]*$" pattern blockname(s):
     - foo_bar (resource)
@@ -10,3 +9,4 @@ ERROR: Provider's version not set:
   - google
 
 ERROR: Terraform's version not set
+

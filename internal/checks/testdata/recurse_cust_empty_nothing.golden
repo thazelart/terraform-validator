@@ -1,0 +1,10 @@
+INFO: running on testdata/recurse_cust_empty_nothing with cust1 configuration
+ERROR: provider.tf misformed:
+  Unmatching "^[a-z0-9_]*$" pattern blockname(s):
+    - foo-bar (resource)
+
+INFO: running on testdata/recurse_cust_empty_nothing/modules/mod1 with cust1 configuration
+ERROR: providers.tf misformed:
+  Unmatching "^[a-z0-9_]*$" pattern blockname(s):
+    - foo-bar (resource)
+

@@ -149,7 +149,6 @@ func (c TfvConfig) GetTerraformConfig(workDir string) TfvConfig {
 		utils.EnsureOrFatal(err)
 	}
 
-	fmt.Printf("INFO: using %s configuration in %s\n", c.CurrentFolderClass, workDir)
 	return c
 }
 

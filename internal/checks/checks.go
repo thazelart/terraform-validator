@@ -50,7 +50,7 @@ func VerifyFile(parsedFile hcl.ParsedFile, pattern string,
 	hasBtErrs := len(btErrs) > 0
 
 	if hasBnErrs || hasBtErrs {
-		fmt.Printf("\nERROR: %s misformed:\n", parsedFile.Name)
+		fmt.Printf("ERROR: %s misformed:\n", parsedFile.Name)
 		if hasBnErrs {
 			fmt.Printf("  Unmatching \"%s\" pattern blockname(s):\n", pattern)
 			for _, err := range bnErrs {
@@ -63,6 +63,7 @@ func VerifyFile(parsedFile hcl.ParsedFile, pattern string,
 				fmt.Printf("    - %s\n", err.Error())
 			}
 		}
+		fmt.Println()
 		return false
 	}
 	return true
@@ -79,10 +80,11 @@ func VerifyProvidersVersion(parsedFolder []hcl.ParsedFile) bool {
 		}
 	}
 	if len(errs) > 0 {
-		fmt.Println("\nERROR: Provider's version not set:")
+		fmt.Println("ERROR: Provider's version not set:")
 		for _, err := range errs {
 			fmt.Printf("  - %s\n", err.Error())
 		}
+		fmt.Println()
 		return false
 	}
 	return true
@@ -98,7 +100,8 @@ func VerifyTerraformVersion(parsedFolder []hcl.ParsedFile) bool {
 	}
 
 	if !isTerraformVersionSet {
-		fmt.Println("\nERROR: Terraform's version not set")
+		fmt.Println("ERROR: Terraform's version not set")
+		fmt.Println()
 		return false
 	}
 	return true
@@ -126,10 +129,11 @@ func VerifyMandatoryFilesPresent(parsedFolder []hcl.ParsedFile,
 
 	// Print errors
 	if len(missingFiles) > 0 {
-		fmt.Println("\nERROR: missing mandatory file(s):")
+		fmt.Println("ERROR: missing mandatory file(s):")
 		for _, missingFile := range missingFiles {
 			fmt.Printf("  - %s\n", missingFile)
 		}
+		fmt.Println()
 		return false
 	}
 
