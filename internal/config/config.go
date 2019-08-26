@@ -35,8 +35,8 @@ type FileConfig struct {
 	Mandatory        bool     `yaml:"mandatory"`
 }
 
-// FolderConfigClass is a type that define a class of config for a folder.
-type FolderConfigClass struct {
+// ConfigLayer is a type that define a layer of config for a folder.
+type ConfigLayer struct {
 	Files                  map[string]FileConfig `yaml:"files"`
 	EnsureTerraformVersion bool                  `yaml:"ensure_terraform_version"`
 	EnsureProvidersVersion bool                  `yaml:"ensure_providers_version"`
@@ -44,16 +44,16 @@ type FolderConfigClass struct {
 }
 
 // TfvConfig is the full configuration of terraform validator
-// CurrentFolderClass is the current folder applied class
-// Classes is a map of FolderConfigClass
+// CurrentLayer is the current folder applied layer
+// Layers is a map of ConfigLayer
 type TfvConfig struct {
-	CurrentFolderClass string
-	Classes            map[string]FolderConfigClass
+	CurrentLayer string
+	Layers            map[string]ConfigLayer
 }
 
-// DefaultFolderConfigClass return you the default FolderConfigClass
-func DefaultFolderConfigClass() FolderConfigClass {
-	return FolderConfigClass{
+// DefaultConfigLayer return you the default ConfigLayer
+func DefaultConfigLayer() ConfigLayer {
+	return ConfigLayer{
 		Files: map[string]FileConfig{
 			"main.tf": {
 				Mandatory:        true,
@@ -89,9 +89,9 @@ func DefaultFolderConfigClass() FolderConfigClass {
 // DefaultTfvConfig returns you the default TfvConfig
 func DefaultTfvConfig() TfvConfig {
 	return TfvConfig{
-		CurrentFolderClass: "default",
-		Classes: map[string]FolderConfigClass{
-			"default": DefaultFolderConfigClass(),
+		CurrentLayer: "default",
+		Layers: map[string]ConfigLayer{
+			"default": DefaultConfigLayer(),
 		},
 	}
 }
@@ -107,32 +107,32 @@ func ParseArgs(version string) string {
 // UnmarshalYAML is a custom yaml unmarshaller for TerraformConfig
 func (c *TfvConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var customO struct {
-		CurrentFolderClass string                       `yaml:"current_folder_class"`
-		Classes            map[string]FolderConfigClass `yaml:"classes"`
+		CurrentLayer string                       `yaml:"current_layer"`
+		Layers            map[string]ConfigLayer `yaml:"layers"`
 	}
 	err := unmarshal(&customO)
 	utils.EnsureOrFatal(err)
 
-	if customO.CurrentFolderClass != "" {
-		c.CurrentFolderClass = customO.CurrentFolderClass
+	if customO.CurrentLayer != "" {
+		c.CurrentLayer = customO.CurrentLayer
 	} else {
-		c.CurrentFolderClass = "default"
+		c.CurrentLayer = "default"
 	}
 
-	if c.Classes == nil {
-		c.Classes = make(map[string]FolderConfigClass)
-		c.Classes["default"] = DefaultFolderConfigClass()
+	if c.Layers == nil {
+		c.Layers = make(map[string]ConfigLayer)
+		c.Layers["default"] = DefaultConfigLayer()
 	}
-	for key, class := range customO.Classes {
-		if len(class.Files) == 0 {
-			class.Files = DefaultFolderConfigClass().Files
+	for key, layer := range customO.Layers {
+		if len(layer.Files) == 0 {
+			layer.Files = DefaultConfigLayer().Files
 		}
 
-		if class.BlockPatternName == "" {
-			class.BlockPatternName = DefaultFolderConfigClass().BlockPatternName
+		if layer.BlockPatternName == "" {
+			layer.BlockPatternName = DefaultConfigLayer().BlockPatternName
 		}
 
-		c.Classes[key] = class
+		c.Layers[key] = layer
 	}
 
 	return nil
@@ -152,29 +152,29 @@ func (c TfvConfig) GetTerraformConfig(workDir string) TfvConfig {
 	return c
 }
 
-// GetFolderConfigClass get the applied FolderConfigClass
-func (c TfvConfig) GetFolderConfigClass() FolderConfigClass {
-	folderConfigClass, ok := c.Classes[c.CurrentFolderClass]
+// GetConfigLayer get the applied ConfigLayer
+func (c TfvConfig) GetConfigLayer() ConfigLayer {
+	configLayer, ok := c.Layers[c.CurrentLayer]
 
 	utils.OkOrFatal(ok,
-		fmt.Sprintf("FATAL: terraform-validation configuration does not contain %s class",
-			c.CurrentFolderClass,
+		fmt.Sprintf("FATAL: terraform-validation configuration does not contain %s layer",
+			c.CurrentLayer,
 		),
 	)
 
-	return folderConfigClass
+	return configLayer
 }
 
 // GetAuthorizedBlocks gets you the authorized blocks for the given filename.
 // If the filename is not configure it gets you the dfault configuration.
 // If their is no default either, return you an error.
-func (folderConfigClass FolderConfigClass) GetAuthorizedBlocks(filename string) ([]string, error) {
-	file, ok := folderConfigClass.Files[filename]
+func (configLayer ConfigLayer) GetAuthorizedBlocks(filename string) ([]string, error) {
+	file, ok := configLayer.Files[filename]
 	if ok {
 		return file.AuthorizedBlocks, nil
 	}
 
-	file, ok = folderConfigClass.Files["default"]
+	file, ok = configLayer.Files["default"]
 	if ok {
 		return file.AuthorizedBlocks, nil
 	}
@@ -183,10 +183,10 @@ func (folderConfigClass FolderConfigClass) GetAuthorizedBlocks(filename string) 
 }
 
 // GetMandatoryFiles get the mandatory file list from the globalConfig
-func (folderConfigClass FolderConfigClass) GetMandatoryFiles() []string {
+func (configLayer ConfigLayer) GetMandatoryFiles() []string {
 	var mandatoryFiles []string
 
-	for filename, fileInfos := range folderConfigClass.Files {
+	for filename, fileInfos := range configLayer.Files {
 		if filename == "default" {
 			continue
 		}

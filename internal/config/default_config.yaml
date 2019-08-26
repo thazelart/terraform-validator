@@ -1,6 +1,6 @@
 ---
-current_folder_class: "tfv_default"
-classes:
+current_layer: "tfv_default"
+layers:
   tfv_default:
     main.tf:
       mandatory: true

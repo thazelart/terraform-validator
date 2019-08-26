@@ -14,9 +14,10 @@ Terraform is a Go library that help you ensure that a terraform folder answer to
  * [x] ensure that mandatory `.tf` files are present
  * [x] ensure that a terraform version has been set
  * [x] ensure that the providers version has been set
+ * [x] layered terraform folders (test recursively)
 
 **Next features:**                    
- * [ ] layered terraform folders (test recursively)
+ * [ ] possibility of prohibiting certain types of resources
  * [ ] ensure Readme was updated (if you are using [terraform-docs](https://github.com/segmentio/terraform-docs))
  * [ ] ensure `terraform fmt` is ok
 

@@ -14,8 +14,8 @@ func MainChecks(conf config.TfvConfig, workDir string) bool {
 	// Get current folder configuration
 	globalConfig := conf.GetTerraformConfig(workDir)
 
-	// Get current folder configuration class
-	currentConfig := globalConfig.GetFolderConfigClass()
+	// Get current folder configuration layer
+	currentLayer := globalConfig.GetConfigLayer()
 
 	// Get the terraform files informations
 	folderParsedContent := hcl.GetFolderParsedContents(workDir)
@@ -23,8 +23,8 @@ func MainChecks(conf config.TfvConfig, workDir string) bool {
 	// Verify files normes and conventions
 	if len(folderParsedContent) > 0 {
 		fmt.Printf("INFO: running on %s with %s configuration\n",
-			workDir, globalConfig.CurrentFolderClass)
-		ok := FolderChecks(folderParsedContent, currentConfig)
+			workDir, globalConfig.CurrentLayer)
+		ok := FolderChecks(folderParsedContent, currentLayer)
 		if !ok {
 			isSuccess = false
 		}
@@ -43,7 +43,7 @@ func MainChecks(conf config.TfvConfig, workDir string) bool {
 }
 
 // FolderChecks run the check inside the given folder
-func FolderChecks(folder []hcl.ParsedFile, config config.FolderConfigClass) bool {
+func FolderChecks(folder []hcl.ParsedFile, config config.ConfigLayer) bool {
 	isSuccess := true
 
 	for _, fileParsedContent := range folder {

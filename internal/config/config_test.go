@@ -24,9 +24,9 @@ func TestParseArgs(t *testing.T) {
 
 func TestDefaultTfvConfig(t *testing.T) {
 	expectedResult := config.TfvConfig{
-		CurrentFolderClass: "default",
-		Classes: map[string]config.FolderConfigClass{
-			"default": config.DefaultFolderConfigClass(),
+		CurrentLayer: "default",
+		Layers: map[string]config.ConfigLayer{
+			"default": config.DefaultConfigLayer(),
 		},
 	}
 
@@ -37,8 +37,8 @@ func TestDefaultTfvConfig(t *testing.T) {
 	}
 }
 
-func TestDefaultFolderConfigClass(t *testing.T) {
-	expectedResult := config.FolderConfigClass{
+func TestDefaultConfigLayer(t *testing.T) {
+	expectedResult := config.ConfigLayer{
 		Files: map[string]config.FileConfig{
 			"main.tf": {
 				Mandatory:        true,
@@ -70,18 +70,18 @@ func TestDefaultFolderConfigClass(t *testing.T) {
 		BlockPatternName:       "^[a-z0-9_]*$",
 	}
 
-	testResult := config.DefaultFolderConfigClass()
+	testResult := config.DefaultConfigLayer()
 
 	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
-		t.Errorf("DefaultFolderConfigClass() mismatch (-want +got):\n%s", diff)
+		t.Errorf("DefaultConfigLayer() mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestUnmarshalYAML(t *testing.T) {
 	// case1 test: using custom config from example
 	expectedCustomResult := config.DefaultTfvConfig()
-	expectedCustomResult.CurrentFolderClass = "cust1"
-	expectedCustomResult.Classes["cust1"] = config.FolderConfigClass{
+	expectedCustomResult.CurrentLayer = "cust1"
+	expectedCustomResult.Layers["cust1"] = config.ConfigLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -92,7 +92,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		},
 		BlockPatternName: "^[a-z0-9_]*$",
 	}
-	expectedCustomResult.Classes["cust2"] = config.FolderConfigClass{
+	expectedCustomResult.Layers["cust2"] = config.ConfigLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -115,7 +115,7 @@ func TestUnmarshalYAML(t *testing.T) {
 
 	// case2 same test with empty TfvConfig
 	customConfigFile = fs.NewFile("testdata/case2/.terraform-validator.yaml")
-	expectedCustomResult.CurrentFolderClass = "default"
+	expectedCustomResult.CurrentLayer = "default"
 	var testCustomResult2 config.TfvConfig
 	err = yaml.Unmarshal(customConfigFile.Content, &testCustomResult2)
 	utils.EnsureOrFatal(err)
@@ -129,8 +129,8 @@ func TestGetTerraformConfig(t *testing.T) {
 	// case1 test case: with custom config
 	WorkDir := "testdata/case1"
 	expectedResult := config.DefaultTfvConfig()
-	expectedResult.CurrentFolderClass = "cust1"
-	expectedResult.Classes["cust1"] = config.FolderConfigClass{
+	expectedResult.CurrentLayer = "cust1"
+	expectedResult.Layers["cust1"] = config.ConfigLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -141,7 +141,7 @@ func TestGetTerraformConfig(t *testing.T) {
 		},
 		BlockPatternName: "^[a-z0-9_]*$",
 	}
-	expectedResult.Classes["cust2"] = config.FolderConfigClass{
+	expectedResult.Layers["cust2"] = config.ConfigLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -169,20 +169,20 @@ func TestGetTerraformConfig(t *testing.T) {
 	}
 }
 
-func TestGetFolderConfigClass(t *testing.T) {
+func TestGetConfigLayer(t *testing.T) {
 	testData := config.DefaultTfvConfig()
-	expectedResult := config.DefaultFolderConfigClass()
+	expectedResult := config.DefaultConfigLayer()
 
-	testResult := testData.GetFolderConfigClass()
+	testResult := testData.GetConfigLayer()
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("GetFolderConfigClass() mismatch (-want +got):\n%s", diff)
+		t.Errorf("GetConfigLayer() mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestGetAuthorizedBlocks(t *testing.T) {
 	testGC := config.DefaultTfvConfig()
-	config := testGC.Classes[testGC.CurrentFolderClass]
+	config := testGC.Layers[testGC.CurrentLayer]
 
 	// test1 with known filename
 	expectedResult := []string{"variable"}
@@ -212,7 +212,7 @@ func TestGetAuthorizedBlocks(t *testing.T) {
 
 func TestGetMandatoryFiles(t *testing.T) {
 	testGC := config.DefaultTfvConfig()
-	conf := testGC.Classes[testGC.CurrentFolderClass]
+	conf := testGC.Layers[testGC.CurrentLayer]
 
 	// set default as mandatory, it must not be in expectedResult
 	tmpDefault := conf.Files["default"]
