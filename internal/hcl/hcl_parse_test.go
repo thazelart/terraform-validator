@@ -24,8 +24,15 @@ func TestGetFolderParsedContents(t *testing.T) {
 			Blocks: hcl.TerraformBlocks{},
 		},
 		{
-			Name:   "outputs.tf",
-			Blocks: hcl.TerraformBlocks{},
+			Name: "outputs.tf",
+			Blocks: hcl.TerraformBlocks{
+				Outputs: []hcl.Output{
+					{
+						Name:        "out1",
+						Description: "",
+					},
+				},
+			},
 		},
 		{
 			Name: "providers.tf",
@@ -39,8 +46,15 @@ func TestGetFolderParsedContents(t *testing.T) {
 			},
 		},
 		{
-			Name:   "variables.tf",
-			Blocks: hcl.TerraformBlocks{},
+			Name: "variables.tf",
+			Blocks: hcl.TerraformBlocks{
+				Variables: []hcl.Variable{
+					{
+						Name:        "var1",
+						Description: "",
+					},
+				},
+			},
 		},
 	}
 	testResult := hcl.GetFolderParsedContents(testPath)

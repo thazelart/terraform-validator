@@ -12,4 +12,5 @@ layers:
           - module
           - data
           - locals
-    
+    ensure_variables_description: true
+    ensure_outputs_description: true

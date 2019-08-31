@@ -25,8 +25,8 @@ func TestParseArgs(t *testing.T) {
 func TestDefaultTfvConfig(t *testing.T) {
 	expectedResult := config.TfvConfig{
 		CurrentLayer: "default",
-		Layers: map[string]config.ConfigLayer{
-			"default": config.DefaultConfigLayer(),
+		Layers: map[string]config.ConfigurationLayer{
+			"default": config.DefaultConfigurationLayer(),
 		},
 	}
 
@@ -37,8 +37,8 @@ func TestDefaultTfvConfig(t *testing.T) {
 	}
 }
 
-func TestDefaultConfigLayer(t *testing.T) {
-	expectedResult := config.ConfigLayer{
+func TestDefaultConfigurationLayer(t *testing.T) {
+	expectedResult := config.ConfigurationLayer{
 		Files: map[string]config.FileConfig{
 			"main.tf": {
 				Mandatory:        true,
@@ -70,10 +70,10 @@ func TestDefaultConfigLayer(t *testing.T) {
 		BlockPatternName:       "^[a-z0-9_]*$",
 	}
 
-	testResult := config.DefaultConfigLayer()
+	testResult := config.DefaultConfigurationLayer()
 
 	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
-		t.Errorf("DefaultConfigLayer() mismatch (-want +got):\n%s", diff)
+		t.Errorf("DefaultConfigurationLayer() mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -81,7 +81,7 @@ func TestUnmarshalYAML(t *testing.T) {
 	// case1 test: using custom config from example
 	expectedCustomResult := config.DefaultTfvConfig()
 	expectedCustomResult.CurrentLayer = "cust1"
-	expectedCustomResult.Layers["cust1"] = config.ConfigLayer{
+	expectedCustomResult.Layers["cust1"] = config.ConfigurationLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -92,7 +92,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		},
 		BlockPatternName: "^[a-z0-9_]*$",
 	}
-	expectedCustomResult.Layers["cust2"] = config.ConfigLayer{
+	expectedCustomResult.Layers["cust2"] = config.ConfigurationLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -130,7 +130,7 @@ func TestGetTerraformConfig(t *testing.T) {
 	WorkDir := "testdata/case1"
 	expectedResult := config.DefaultTfvConfig()
 	expectedResult.CurrentLayer = "cust1"
-	expectedResult.Layers["cust1"] = config.ConfigLayer{
+	expectedResult.Layers["cust1"] = config.ConfigurationLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -141,7 +141,7 @@ func TestGetTerraformConfig(t *testing.T) {
 		},
 		BlockPatternName: "^[a-z0-9_]*$",
 	}
-	expectedResult.Layers["cust2"] = config.ConfigLayer{
+	expectedResult.Layers["cust2"] = config.ConfigurationLayer{
 		Files: map[string]config.FileConfig{
 			"backend.tf":   {AuthorizedBlocks: []string{"terraform"}, Mandatory: true},
 			"default":      {AuthorizedBlocks: []string{"resource", "module", "data", "locals"}},
@@ -169,14 +169,14 @@ func TestGetTerraformConfig(t *testing.T) {
 	}
 }
 
-func TestGetConfigLayer(t *testing.T) {
+func TestGetConfigurationLayer(t *testing.T) {
 	testData := config.DefaultTfvConfig()
-	expectedResult := config.DefaultConfigLayer()
+	expectedResult := config.DefaultConfigurationLayer()
 
-	testResult := testData.GetConfigLayer()
+	testResult := testData.GetConfigurationLayer()
 
 	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
-		t.Errorf("GetConfigLayer() mismatch (-want +got):\n%s", diff)
+		t.Errorf("GetConfigurationLayer() mismatch (-want +got):\n%s", diff)
 	}
 }
 

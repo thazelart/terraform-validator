@@ -1,23 +1,25 @@
 package checks_test
 
 import (
+	"fmt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/kami-zh/go-capturer"
 	"github.com/thazelart/terraform-validator/internal/checks"
 	"github.com/thazelart/terraform-validator/internal/hcl"
+	"sort"
 	"testing"
 )
 
-var parsedFile = hcl.ParsedFile{
+var parsedFileOk = hcl.ParsedFile{
 	Name: "main.tf",
 	Blocks: hcl.TerraformBlocks{
 		Variables: []hcl.Variable{
 			{Name: "var_with_description", Description: "a var description"},
-			{Name: "var_without_description", Description: ""},
+			{Name: "var_2", Description: "2"},
 		},
 		Outputs: []hcl.Output{
 			{Name: "out_with_description", Description: "a output description"},
-			{Name: "out_without_description", Description: ""},
+			{Name: "out_2", Description: "2"},
 		},
 		Resources: []hcl.Resource{
 			{Name: "a_resource", Type: "google_sql_database"},
@@ -40,24 +42,85 @@ var parsedFile = hcl.ParsedFile{
 	},
 }
 
+var parsedFileKo = hcl.ParsedFile{
+	Name: "main.tf",
+	Blocks: hcl.TerraformBlocks{
+		Variables: []hcl.Variable{
+			{Name: "var_with_description", Description: "a var description"},
+			{Name: "var_2", Description: ""},
+		},
+		Outputs: []hcl.Output{
+			{Name: "out_with_description", Description: "a output description"},
+			{Name: "out_2", Description: ""},
+		},
+		Resources: []hcl.Resource{
+			{Name: "a_resource", Type: "google_sql_database"},
+		},
+		Locals: []hcl.Locals{
+			{"a_local", "another_local"},
+			{"third_local"},
+		},
+		Data: []hcl.Data{
+			{Name: "a_data", Type: "consul_key_prefix"},
+			{Name: "a-data", Type: "consul_key_prefix"},
+		},
+		Providers: []hcl.Provider{
+			{Name: "google", Version: "=1.28.0"},
+		},
+		Terraform: hcl.Terraform{Version: "> 0.12.0", Backend: "gcs"},
+		Modules: []hcl.Module{
+			{Name: "consul", Version: "0.0.5"},
+			{Name: "network", Version: "1.2.3"},
+		},
+	},
+}
+
+func TestVerifyVariablesOutputsDescritions(t *testing.T) {
+	parsedFileTest := parsedFileOk
+
+	// without error
+	var expectedResult []error
+	testResult := checks.VerifyVariablesOutputsDescritions(parsedFileTest, true, true)
+
+	if diff := cmp.Diff(expectedResult, testResult); diff != "" {
+		t.Errorf("VerifyVariablesOutputsDescritions(ok) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 with errors
+	parsedFileTest = parsedFileKo
+	expectedResult = append(expectedResult, fmt.Errorf("out_2 (output)"))
+	expectedResult = append(expectedResult, fmt.Errorf("var_2 (variable)"))
+
+	testResult = checks.VerifyVariablesOutputsDescritions(parsedFileTest, true, true)
+
+	var stringExpectedResult, stringTestResult []string
+	for i := range expectedResult {
+		stringExpectedResult = append(stringExpectedResult, expectedResult[i].Error())
+		stringTestResult = append(stringTestResult, testResult[i].Error())
+	}
+	sort.Strings(stringExpectedResult)
+	sort.Strings(stringTestResult)
+	if diff := cmp.Diff(stringExpectedResult, stringTestResult); diff != "" {
+		t.Errorf("VerifyVariablesOutputsDescritions(ko) mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestVerifyFile(t *testing.T) {
 	// test1 well formed ParsedFile
-	parsedFileTest := parsedFile
+	parsedFileTest := parsedFileOk
 	authorizedBocks := []string{"module", "locals", "provider", "data",
 		"variable", "resource", "output", "terraform"}
 	expectedOut := ""
 	testOut := capturer.CaptureStdout(func() {
-		checks.VerifyFile(parsedFileTest, "^[a-z0-9_]*$", authorizedBocks)
+		checks.VerifyFile(parsedFileTest, "^[a-z0-9_]*$", authorizedBocks, true, true)
 	})
 
 	if diff := cmp.Diff(expectedOut, testOut); diff != "" {
 		t.Errorf("VerifyFile(ok) mismatch (-want +got):\n%s", diff)
 	}
 
-	// test2 with unwanted blocks and misnamed bloc
-	parsedFileTest.Blocks.Data = []hcl.Data{
-		{Name: "a-data", Type: "consul_key_prefix"},
-	}
+	// test2 with unwanted blocks and misnamed bloc and no descrition
+	parsedFileTest = parsedFileKo
 	authorizedBocks = []string{"module", "locals", "provider", "data",
 		"variable", "output", "terraform"}
 
@@ -66,11 +129,14 @@ func TestVerifyFile(t *testing.T) {
     - a-data (data)
   Unauthorized block(s):
     - resource
+  Undescribed variables(s) and/or output(s):
+    - var_2 (variable)
+    - out_2 (output)
 
 `
 
 	testOut = capturer.CaptureStdout(func() {
-		checks.VerifyFile(parsedFileTest, "^[a-z0-9_]*$", authorizedBocks)
+		checks.VerifyFile(parsedFileTest, "^[a-z0-9_]*$", authorizedBocks, true, true)
 	})
 
 	if diff := cmp.Diff(expectedOut, testOut); diff != "" {

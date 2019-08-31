@@ -9,16 +9,17 @@ Terraform is a Go library that help you ensure that a terraform folder answer to
 * You're a lonely developer that develop a lot of modules and you want to have a certain consistency between them               
 
 **Features:**         
- * [x] ensure that the terraform blocknames follow the given pattern
- * [x] ensure that blocks are in a wanted files (for example output blocks must be in `outputs.tf`)
+ * [x] make sure that the block names match a certain pattern
+ * [x] s'assurer que le code est bien dispatché. Pour ça vous pouvez décider quel type de bloc peut contenir chaque fichier (for example output blocks must be in `outputs.tf`).
  * [x] ensure that mandatory `.tf` files are present
- * [x] ensure that a terraform version has been set
- * [x] ensure that the providers version has been set
+ * [x] ensure that the terraform version has been defined
+ * [x] ensure that the providers' version has been defined
+ * [x] make sure that the variables and/or outputs blocks have the description argument filled in.
  * [x] layered terraform folders (test recursively)
 
 **Next features:**                    
  * [ ] possibility of prohibiting certain types of resources
- * [ ] ensure Readme was updated (if you are using [terraform-docs](https://github.com/segmentio/terraform-docs))
+ * [ ] ensure Readme was updated (using [terraform-docs](https://github.com/segmentio/terraform-docs) as a first step)
  * [ ] ensure `terraform fmt` is ok
 
 :warning: **Terraform 0.12+ is supported only by the versions 2.0.0 and higher**.
@@ -27,25 +28,21 @@ Terraform is a Go library that help you ensure that a terraform folder answer to
 
 Prerequisite: install [Go 1.11+](https://golang.org/).
 
-### Install from code:
-To add terraform-validator, I recommend using a Go dependency manager such as
-[dep](https://github.com/golang/dep):
-
-```bash
-go mod init github.com/thazelart/terraform-validator
-```
-
-then you can install it :
-
-```bash
-go mod download
-go install
-```
-
 ### Get the last version from releases
-You can [download from here](https://github.com/thazelart/terraform-validator/releases) the binary. move it into a directory in your `$PATH` to use it:
+You can [download from here](https://github.com/thazelart/terraform-validator/releases) the binary. move it into a directory in your `$PATH` to use it. For example:
 ```
 mv ~/download/terraform-validator /usr/local/bin
+```
+
+### Install from code:
+To add terraform-validator, clone this repository and then get :
+then you can build it:
+```bash
+go build
+```
+move it into a directory in your `$PATH` to use it. For example:
+```
+mv terraform-validator /usr/local/bin
 ```
 
 ## Getting Started
@@ -54,6 +51,11 @@ Show help information:
 
 ``` bash
 terraform-validator --help
+```
+Show terraform-validator version:
+
+``` bash
+terraform-validator --version
 ```
 
 Validate a terraform folder located in `./examples`:
