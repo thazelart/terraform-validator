@@ -36,20 +36,43 @@ func verifyAuthorizedBlocktypes(blocks map[string][]string, authorizedBlocks []s
 	return errs
 }
 
+// VerifyVariablesOutputsDescritions ensure that all the variables and
+// outputs blocks have a descrition
+func VerifyVariablesOutputsDescritions(parsedFile hcl.ParsedFile,
+	verifyVariables bool, verifyOutputs bool) (errs []error) {
+	if verifyVariables {
+		for _, variable := range parsedFile.Blocks.Variables {
+			if variable.Description == "" {
+				errs = append(errs, fmt.Errorf("%s (variable)", variable.Name))
+			}
+		}
+	}
+	if verifyOutputs {
+		for _, output := range parsedFile.Blocks.Outputs {
+			if output.Description == "" {
+				errs = append(errs, fmt.Errorf("%s (output)", output.Name))
+			}
+		}
+	}
+	return errs
+}
+
 // VerifyFile launch every check that are file dependant (block names and
 // authorized blocks)
 func VerifyFile(parsedFile hcl.ParsedFile, pattern string,
-	authorizedBlocks []string) bool {
+	authorizedBlocks []string, verifyVariables bool, verifyOutputs bool) bool {
 
 	blocks := parsedFile.GetBlockNamesByType()
 
 	bnErrs := verifyBlockNames(blocks, pattern)
 	btErrs := verifyAuthorizedBlocktypes(blocks, authorizedBlocks)
+	ioErrs := VerifyVariablesOutputsDescritions(parsedFile, verifyVariables, verifyOutputs)
 
 	hasBnErrs := len(bnErrs) > 0
 	hasBtErrs := len(btErrs) > 0
+	hasIoErrs := len(ioErrs) > 0
 
-	if hasBnErrs || hasBtErrs {
+	if hasBnErrs || hasBtErrs || hasIoErrs {
 		fmt.Printf("ERROR: %s misformed:\n", parsedFile.Name)
 		if hasBnErrs {
 			fmt.Printf("  Unmatching \"%s\" pattern blockname(s):\n", pattern)
@@ -60,6 +83,12 @@ func VerifyFile(parsedFile hcl.ParsedFile, pattern string,
 		if hasBtErrs {
 			fmt.Println("  Unauthorized block(s):")
 			for _, err := range btErrs {
+				fmt.Printf("    - %s\n", err.Error())
+			}
+		}
+		if hasIoErrs {
+			fmt.Println("  Undescribed variables(s) and/or output(s):")
+			for _, err := range ioErrs {
 				fmt.Printf("    - %s\n", err.Error())
 			}
 		}

@@ -2,3 +2,11 @@
 provider "google" {
 
 }
+
+variable "var1" {
+
+}
+
+output "out1" {
+
+}

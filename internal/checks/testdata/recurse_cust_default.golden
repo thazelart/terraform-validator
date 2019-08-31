@@ -2,6 +2,8 @@ INFO: running on testdata/recurse_cust_default with cust1 configuration
 ERROR: provider.tf misformed:
   Unmatching "^[a-z0-9_]*$" pattern blockname(s):
     - foo-bar (resource)
+  Undescribed variables(s) and/or output(s):
+    - out1 (output)
 
 INFO: running on testdata/recurse_cust_default/mod1 with default configuration
 ERROR: providers.tf misformed:
@@ -12,6 +14,4 @@ ERROR: providers.tf misformed:
 
 ERROR: missing mandatory file(s):
   - backend.tf
-  - outputs.tf
-  - variables.tf
 

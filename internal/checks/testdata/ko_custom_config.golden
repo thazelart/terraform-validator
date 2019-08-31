@@ -5,6 +5,11 @@ ERROR: main.tf misformed:
   Unauthorized block(s):
     - resource
 
+ERROR: provider.tf misformed:
+  Undescribed variables(s) and/or output(s):
+    - var1 (variable)
+    - out1 (output)
+
 ERROR: Provider's version not set:
   - google
 

@@ -41,6 +41,8 @@ layers:
           - locals
     ensure_terraform_version: false
     ensure_providers_version: false
+    ensure_variables_description: false
+    ensure_outputs_description: false
     block_pattern_name: "^[a-z0-9_]*$"
 ```
 ### What is a layer ?
@@ -96,8 +98,19 @@ Configure terraform-validator in order to ensure (or not) if the terraform versi
 
 #### ensure_providers_version
 *Type: `boolean`*                 
-*Default: `false`*    
+*Default: `false`*          
 Configure terraform-validator in order to ensure (or not) if the providers versions has been set.
+
+
+#### ensure_variables_description
+*Type: `boolean`*                 
+*Default: `false`*          
+configures terraform-validator to check whether or not the variable blocks are described.
+
+#### ensure_outputs_description
+*Type: `boolean`*                 
+*Default: `false`*           
+configures terraform-validator to check whether or not the output blocks are described.
 
 #### block_pattern_name
 *Type: `string`*                 

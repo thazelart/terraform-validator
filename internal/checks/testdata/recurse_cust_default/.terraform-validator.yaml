@@ -12,4 +12,4 @@ layers:
           - module
           - data
           - locals
-    
+    ensure_outputs_description: true

@@ -13,4 +13,6 @@ layers:
           - locals
     ensure_providers_version: true
     ensure_terraform_version: true
+    ensure_variables_description: true
+    ensure_outputs_description: true
     block_pattern_name: "^[a-z0-9-]*$"
