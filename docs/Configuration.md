@@ -119,7 +119,7 @@ Configure the pattern that should match each terraform resources.
 
 
 ## current_layer
-*Type: `string`*
+*Type: `string`*                     
 *Default: `default`*                       
 The `current_layer` permit you to select the configuration layer you want to use in the current folder.
 

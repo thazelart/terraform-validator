@@ -12,9 +12,6 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-before_deploy:
-  - rm -f coverage.txt
-
 deploy:
   - provider: script
     skip_cleanup: true
