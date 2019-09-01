@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.com/thazelart/terraform-validator.svg?branch=master)](https://travis-ci.com/thazelart/terraform-validator) [![CodeCov](https://codecov.io/gh/thazelart/terraform-validator/branch/master/graph/badge.svg)](https://codecov.io/gh/thazelart/terraform-validator) [![Go Report Card](https://goreportcard.com/badge/github.com/thazelart/terraform-validator)](https://goreportcard.com/report/github.com/thazelart/terraform-validator)      
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/thazelart/terraform-validator.svg)](https://hub.docker.com/r/thazelart/terraform-validator) [![Docker Pulls](https://img.shields.io/docker/pulls/thazelart/terraform-validator)](https://hub.docker.com/r/thazelart/terraform-validator)                 
 
-Terraform is a Go library that help you ensure that a terraform folder answer to your norms and conventions rules. This can be really useful in several cases :
+This tool will help you ensure that a terraform folder answer to your norms and conventions rules. This can be really useful in several cases :
 * You're a team that want to have a clean and maintainable code
 * You're a lonely developer that develop a lot of modules and you want to have a certain consistency between them               
 
