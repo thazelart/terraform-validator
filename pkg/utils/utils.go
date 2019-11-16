@@ -4,7 +4,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"github.com/hashicorp/hcl2/hcl"
+	"github.com/hashicorp/hcl/v2"
 	"log"
 	"os"
 	"os/exec"

@@ -1,7 +1,7 @@
 package hcl
 
 import (
-	"github.com/hashicorp/hcl2/hcl"
+	hcl "github.com/hashicorp/hcl/v2"
 )
 
 type hclNameDescription struct {
