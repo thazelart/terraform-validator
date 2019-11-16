@@ -2,8 +2,8 @@
 package hcl
 
 import (
-	"github.com/hashicorp/hcl2/gohcl"
-	"github.com/hashicorp/hcl2/hclparse"
+	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/thazelart/terraform-validator/internal/fs"
 	"github.com/thazelart/terraform-validator/pkg/utils"
 	"sort"
