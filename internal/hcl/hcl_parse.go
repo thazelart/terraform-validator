@@ -143,10 +143,8 @@ func (hclroot hclRoot) getProvidersInfomation() []Provider {
 
 	for _, provider := range hclroot.Providers {
 		var version string
-		for _, arg := range provider.Default {
-			if arg.Name == "version" {
-				gohcl.DecodeExpression(arg.Expr, nil, &version)
-			}
+		if provider.Version != nil {
+			version = *provider.Version
 		}
 		result = append(result, Provider{Name: provider.Name, Version: version})
 	}

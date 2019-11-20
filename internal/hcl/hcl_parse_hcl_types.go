@@ -10,8 +10,14 @@ type hclNameDescription struct {
 }
 type hclVariable hclNameDescription
 type hclOutput hclNameDescription
-type hclProvider hclNameDescription
 type hclModule hclNameDescription
+
+type hclProvider struct {
+	Name    string   `hcl:"name,label"`
+	Alias   *string  `hcl:"alias,attr"`
+	Version *string  `hcl:"version,attr"`
+	Config  hcl.Body `hcl:",remain"`
+}
 
 type hclNameType struct {
 	Type   string   `hcl:"type,label"`
