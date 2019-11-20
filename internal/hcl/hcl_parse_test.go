@@ -42,6 +42,10 @@ func TestGetFolderParsedContents(t *testing.T) {
 						Name:    "google",
 						Version: "foo",
 					},
+					{
+						Name:    "aws",
+						Version: "foo2",
+					},
 				},
 			},
 		},

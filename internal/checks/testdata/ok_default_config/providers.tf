@@ -2,3 +2,10 @@
 provider "google" {
   version = "foo"
 }
+
+provider "aws" {
+  version = "foo2"
+  assume_role {
+    role_arn = "role"
+  }
+}
