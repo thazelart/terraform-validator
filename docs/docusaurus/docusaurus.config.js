@@ -14,9 +14,13 @@ module.exports = {
   organizationName: 'thazelart', // Usually your GitHub org/user name.
   projectName: 'terraform-validator', // Usually your repo name.
 
-
   themeConfig: {
     disableDarkMode: true,
+    algolia: {
+      apiKey: '050bcd29a00cc5551793c2d6eadfb2a1',
+      indexName: 'terraform-validator',
+      algoliaOptions: {}, // Optional, if provided by Algolia
+    },
     navbar: {
       title: '',
       logo: {
@@ -40,34 +44,6 @@ module.exports = {
     footer: {
       style: 'dark',
       links: [],
-      //   {
-      //     title: 'Docs',
-      //     items: [
-      //       {
-      //         label: 'Docs',
-      //         to: 'docs/getting-started/introduction',
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     title: 'Community',
-      //     items: [
-      //       {
-      //         label: 'Discord',
-      //         href: 'https://discordapp.com/invite/docusaurus',
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     title: 'Social',
-      //     items: [
-      //       {
-      //         label: 'Blog',
-      //         to: 'blog',
-      //       },
-      //     ],
-      //   },
-      // ],
       copyright: `Copyright © ${new Date().getFullYear()} thazelart, built with Docusaurus.`,
     },
   },
