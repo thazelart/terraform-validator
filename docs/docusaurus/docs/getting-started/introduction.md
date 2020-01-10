@@ -8,20 +8,20 @@ sidebar_label: Introduction
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/thazelart/terraform-validator.svg)](https://hub.docker.com/r/thazelart/terraform-validator) [![Docker Pulls](https://img.shields.io/docker/pulls/thazelart/terraform-validator)](https://hub.docker.com/r/thazelart/terraform-validator)                 
 
 This tool will help you ensure that a terraform folder answer to your norms and conventions rules. This can be really useful in several cases :
-* You're a team that want to have a clean and maintainable code
-* You're a lonely developer that develop a lot of modules and you want to have a certain consistency between them               
+* You're a team that want to have a clean and maintainable code.
+* You're a lonely developer that develop a lot of modules and you want to have a certain consistency between them.               
 
-**Features:**         
- * [x] make sure that the block names match a certain pattern
- * [x] s'assurer que le code est bien dispatché. Pour ça vous pouvez décider quel type de bloc peut contenir chaque fichier (for example output blocks must be in `outputs.tf`).
- * [x] ensure that mandatory `.tf` files are present
- * [x] ensure that the terraform version has been defined
- * [x] ensure that the providers' version has been defined
+**Features:**
+ * [x] make sure that the block names match a certain pattern.
+ * [x] make sure that the code is properly dispatched. To do this you can decide what type of block can contain each file (for example output blocks must be in `outputs.tf`).
+ * [x] ensure that mandatory `.tf` files are present.
+ * [x] ensure that the terraform version has been defined.
+ * [x] ensure that the providers' version has been defined.
  * [x] make sure that the variables and/or outputs blocks have the description argument filled in.
- * [x] layered terraform folders (test recursively)
+ * [x] layered terraform folders (test recursively).
 
-**Next features:**                    
- * [ ] possibility of prohibiting certain types of resources
- * [ ] ensure `terraform fmt` is ok
+**Next features:**
+ * [ ] possibility of prohibiting certain types of resources.
+ * [ ] ensure `terraform fmt` is ok.
 
 :warning: **Terraform 0.12+ is supported only by the versions 2.0.0 and higher**.
