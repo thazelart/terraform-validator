@@ -15,6 +15,7 @@ module.exports = {
   projectName: 'terraform-validator', // Usually your repo name.
 
   themeConfig: {
+    image: 'img/terraform-validator.svg',
     disableDarkMode: true,
     algolia: {
       apiKey: '050bcd29a00cc5551793c2d6eadfb2a1',
