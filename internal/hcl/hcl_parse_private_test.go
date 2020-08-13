@@ -53,6 +53,16 @@ provider "google" {
 terraform {
 	required_version = "> 0.12.0"
 	backend "gcs" {}
+	required_providers {
+    aws = {
+      version = ">= 2.7.0"
+      source = "hashicorp/aws"
+    }
+    gcp = {
+      source = "hashicorp/gcp"
+    }
+    newrelic = "~> 1.19"
+  }
 }
 
 module "consul" {
@@ -90,7 +100,11 @@ var TestExpectedResult = TerraformBlocks{
 	Providers: []Provider{
 		{Name: "google", Version: "=1.28.0"},
 	},
-	Terraform: Terraform{Version: "> 0.12.0", Backend: "gcs"},
+	Terraform: Terraform{
+		Version:           "> 0.12.0",
+		Backend:           "gcs",
+		RequiredProviders: map[string]string{"aws": ">= 2.7.0", "gcp": "", "newrelic": "~> 1.19"},
+	},
 	Modules: []Module{
 		{Name: "consul", Version: "0.0.5"},
 		{Name: "network", Version: "1.2.3"},
@@ -216,8 +230,9 @@ func TestGetTerraformInfomation(t *testing.T) {
 	parsedContent = hclParse(testFile)
 
 	expectedResult := Terraform{
-		Version: "",
-		Backend: "gcs",
+		Version:           "",
+		Backend:           "gcs",
+		RequiredProviders: map[string]string{},
 	}
 	testResult = parsedContent.getTerraformInfomation()
 
@@ -234,12 +249,41 @@ func TestGetTerraformInfomation(t *testing.T) {
 	parsedContent = hclParse(testFile)
 
 	expectedResult = Terraform{
-		Version: "> 0.12.0",
-		Backend: "",
+		Version:           "> 0.12.0",
+		Backend:           "",
+		RequiredProviders: map[string]string{},
 	}
 	testResult = parsedContent.getTerraformInfomation()
 
 	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
 		t.Errorf("getTerraformInfomation(version) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test4 only requiredProvider
+	content = `terraform {
+		required_providers {
+	    aws = {
+	      version = ">= 2.7.0"
+	      source = "hashicorp/aws"
+	    }
+	    gcp = {
+	      source = "hashicorp/gcp"
+	    }
+	    newrelic = "~> 1.19"
+	  }
+	}`
+	testFile = fs.File{Path: "test.tf", Content: []byte(content)}
+
+	parsedContent = hclParse(testFile)
+
+	expectedResult = Terraform{
+		Version:           "",
+		Backend:           "",
+		RequiredProviders: map[string]string{"aws": ">= 2.7.0", "gcp": "", "newrelic": "~> 1.19"},
+	}
+	testResult = parsedContent.getTerraformInfomation()
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("getTerraformInfomation(requiredProvider) mismatch (-want +got):\n%s", diff)
 	}
 }

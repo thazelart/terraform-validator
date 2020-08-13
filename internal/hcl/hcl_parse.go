@@ -52,7 +52,7 @@ func GetParsedContent(f fs.File) ParsedFile {
 	if modules := root.getModulesInfomation(); modules != nil {
 		result.Blocks.Modules = modules
 	}
-	if terraform := root.getTerraformInfomation(); terraform != *new(Terraform) {
+	if terraform := root.getTerraformInfomation(); !TerraformBlockIsEmpty(terraform) {
 		result.Blocks.Terraform = terraform
 	}
 
@@ -180,6 +180,7 @@ func (hclroot hclRoot) getModulesInfomation() []Module {
 func (hclroot hclRoot) getTerraformInfomation() Terraform {
 	terraformConfig := hclroot.Terraform
 	var version, backend string
+	requiredProviders := make(map[string]string)
 
 	if terraformConfig == nil {
 		return *new(Terraform)
@@ -191,8 +192,24 @@ func (hclroot hclRoot) getTerraformInfomation() Terraform {
 	if terraformConfig.Backend != nil {
 		backend = terraformConfig.Backend.Type
 	}
+	if terraformConfig.RequiredProviders != nil {
+		for _, value := range terraformConfig.RequiredProviders.Config {
+			if value.Expr != nil {
+				// Get the provider required version
+				var version string
+				gohcl.DecodeExpression(value.Expr, nil, &version)
+				if version == "" {
+					var desc map[string]string
+					gohcl.DecodeExpression(value.Expr, nil, &desc)
+					version = desc["version"]
+				}
+				requiredProviders[value.Name] = version
+			}
+		}
+	}
 	return Terraform{
-		Version: version,
-		Backend: backend,
+		Version:           version,
+		Backend:           backend,
+		RequiredProviders: requiredProviders,
 	}
 }

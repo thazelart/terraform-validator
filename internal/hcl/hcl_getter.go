@@ -28,7 +28,7 @@ func (parsedfile ParsedFile) GetBlockNamesByType() map[string][]string {
 			result["locals"] = append(result["locals"], local)
 		}
 	}
-	if parsedfile.Blocks.Terraform != *new(Terraform) {
+	if !TerraformBlockIsEmpty(parsedfile.Blocks.Terraform) {
 		result["terraform"] = []string{}
 	}
 	return result
