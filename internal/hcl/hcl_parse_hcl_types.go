@@ -36,9 +36,15 @@ type backend struct {
 	Type   string   `hcl:"type,label"`
 	Config hcl.Body `hcl:",remain"`
 }
+
+type requiredProviders struct {
+	Config hcl.Attributes `hcl:",remain"`
+}
+
 type hclTerraform struct {
-	RequiredVersion *string  `hcl:"required_version,attr"`
-	Backend         *backend `hcl:"backend,block"`
+	RequiredVersion   *string            `hcl:"required_version,attr"`
+	Backend           *backend           `hcl:"backend,block"`
+	RequiredProviders *requiredProviders `hcl:"required_providers,block"`
 }
 
 type hclRoot struct {

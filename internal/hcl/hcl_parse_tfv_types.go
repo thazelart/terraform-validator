@@ -40,8 +40,9 @@ type Module nameVersion
 
 // Terraform get all needed information of terraform config blocks for terraform-validator
 type Terraform struct {
-	Version string
-	Backend string
+	Version           string
+	Backend           string
+	RequiredProviders map[string]string
 }
 
 // Locals get all needed information of Locals config blocks for terraform-validator
@@ -64,4 +65,12 @@ type TerraformBlocks struct {
 type ParsedFile struct {
 	Name   string
 	Blocks TerraformBlocks
+}
+
+// TerraformBlockIsEmpty return true if terraform variable is empty else false
+func TerraformBlockIsEmpty(terraform Terraform) bool {
+	if terraform.Version != "" || terraform.Backend != "" || len(terraform.RequiredProviders) > 0 {
+		return false
+	}
+	return true
 }

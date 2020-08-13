@@ -15,7 +15,9 @@ func TestGetFolderParsedContents(t *testing.T) {
 			Name: "backend.tf",
 			Blocks: hcl.TerraformBlocks{
 				Terraform: hcl.Terraform{
-					Version: ">=0.12",
+					Version:           ">=0.12",
+					Backend:           "",
+					RequiredProviders: map[string]string{"aws": ">= 2.7.0", "newrelic": "~> 1.19"},
 				},
 			},
 		},
@@ -100,5 +102,63 @@ func TestGetParsedContent(t *testing.T) {
 
 	if diff := cmp.Diff(expectedResult2, testResult2); diff != "" {
 		t.Errorf("hclParse(variable) mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestTerraformBlockIsEmpty(t *testing.T) {
+	// test1 is Empty
+	testTerraform := hcl.Terraform{
+		Version:           "",
+		Backend:           "",
+		RequiredProviders: map[string]string{},
+	}
+	expectedResult := true
+
+	testResult := hcl.TerraformBlockIsEmpty(testTerraform)
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("TerraformBlockIsEmpty() mismatch (-want +got):\n%s", diff)
+	}
+
+	// test2 only Backend
+	testTerraform = hcl.Terraform{
+		Version:           "",
+		Backend:           "gcs",
+		RequiredProviders: map[string]string{},
+	}
+	expectedResult = false
+
+	testResult = hcl.TerraformBlockIsEmpty(testTerraform)
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("TerraformBlockIsEmpty(backend) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test3 only version
+	testTerraform = hcl.Terraform{
+		Version:           "> 0.12",
+		Backend:           "",
+		RequiredProviders: map[string]string{},
+	}
+	expectedResult = false
+
+	testResult = hcl.TerraformBlockIsEmpty(testTerraform)
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("TerraformBlockIsEmpty(version) mismatch (-want +got):\n%s", diff)
+	}
+
+	// test4 only requiredProvider
+	testTerraform = hcl.Terraform{
+		Version:           "",
+		Backend:           "",
+		RequiredProviders: map[string]string{"aws": ">= 2.7.0", "gcp": "", "newrelic": "~> 1.19"},
+	}
+	expectedResult = false
+
+	testResult = hcl.TerraformBlockIsEmpty(testTerraform)
+
+	if diff := cmp.Diff(testResult, expectedResult); diff != "" {
+		t.Errorf("TerraformBlockIsEmpty(requiredVersion) mismatch (-want +got):\n%s", diff)
 	}
 }

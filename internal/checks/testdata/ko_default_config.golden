@@ -6,7 +6,6 @@ ERROR: providers.tf misformed:
     - resource
 
 ERROR: missing mandatory file(s):
-  - backend.tf
   - outputs.tf
   - variables.tf
 
