@@ -50,7 +50,7 @@ func GetSubFolderList(pathF string) []string {
 	utils.EnsureOrFatal(err)
 
 	for _, f := range filesInfo {
-		if f.IsDir() {
+		if f.IsDir() && f.Name() != ".terraform" {
 			folders = append(folders, path.Join(pathF, f.Name()))
 		}
 	}
