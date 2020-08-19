@@ -10,5 +10,5 @@ RUN go install
 FROM alpine:latest  
 LABEL maintainer="Thibault Hazelart <thazelart@gmail.com>"
 COPY --from=builder /go/bin/terraform-validator /usr/local/bin
-WORKDIR /root/terraform-validator
+WORKDIR /data
 CMD ["terraform-validator", "."]
