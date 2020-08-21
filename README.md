@@ -26,6 +26,13 @@ This tool will help you ensure that a terraform folder answer to your norms and 
 ## Documentation
 Please for the Documentation go the terraform-validator [GitHub Pages](https://thazelart.github.io/terraform-validator/docs/getting-started/introduction).
 
+### Docker
+
+Run `terraform-validator` from a docker container:
+```bash
+docker run --name terraform-validator -v "$(pwd)":/data thazelart/terraform-validator
+```
+
 ## Authors
 [Thibault Hazelart](https://github.com/thazelart)                   
 Logo by [Alexis Normand](https://github.com/alexis-n)
