@@ -13,7 +13,7 @@ layers:
         mandatory: true
         authorized_blocks:
       variables.tf:
-        mandatory: true,
+        mandatory: true
         authorized_blocks:
           - variable
       outputs.tf:
@@ -73,7 +73,7 @@ If a match does not match exactly one of the files, the configuration will be ta
         authorized_blocks:
       # variables.tf is not mandatory with only variable blocks inside
       variables.tf:
-        mandatory: true,
+        mandatory: true
         authorized_blocks:
           - variable
       # other files will match default config
