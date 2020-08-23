@@ -19,3 +19,6 @@ dist/
 
 # gotest
 coverage.txt
+
+# macOS
+.DS_Store
