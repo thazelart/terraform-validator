@@ -21,7 +21,7 @@ This tool will help you ensure that a terraform folder answer to your norms and 
 :warning: **Terraform 0.12+ is supported only by the versions 2.0.0 and higher**.
 
 ## Documentation
-Please find the full documentation [here (ReadTheDocs)](https://thazelart.github.io/terraform-validator/docs/getting-started/introduction).
+Please find the full documentation [here (ReadTheDocs)](https://terraform-validator.readthedocs.io).
 
 ## Authors
 [Thibault Hazelart](https://github.com/thazelart)                   
