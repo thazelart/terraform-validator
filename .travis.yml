@@ -9,8 +9,14 @@ env:
 before_install:
   - go get -t -v ./...
 
+addons:
+  sonarcloud:
+    organization: "thazelart"
+    token: $SONAR_TOKEN
+
 script:
   - ./go.test.sh
+  - sonar-scanner
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
