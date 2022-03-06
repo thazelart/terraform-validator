@@ -1,3 +1,6 @@
+:warning: **This repository is not maintained anymore. Sorry for the inconvenience**.
+
+
 [![Terraform-Validator](docs/source/_static/terraform-validator.svg)](https://thazelart.github.io/terraform-validator/)
 
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go#validation) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)    
